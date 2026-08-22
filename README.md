@@ -13,7 +13,7 @@ Grupo 9
 - 85922 - Marrali, Matias
 - 87440 - Mazzucco, Giuliano
 - 63903 - Rodríguez, Fernando Marcos
-
+- 86424 - Dagum , Braian David
 
 # Reglas de nombrado
 
