@@ -14,6 +14,7 @@ Grupo 9
 - 87440 - Mazzucco, Giuliano
 - 63903 - Rodríguez, Fernando Marcos
 - 86424 - Dagum , Braian David
+- 86199 - Ladux, Carlos Agustin
 
 # Reglas de nombrado
 
