@@ -16,6 +16,7 @@ Grupo 9
 - 86424 - Dagum , Braian David
 - 86199 - Ladux, Carlos Agustin
 - 90891 - Mansilla, Benjamin Felipe
+- 94393 - Garro Vazquez, Matias Nicolas
 
 # Reglas de nombrado
 
