@@ -120,6 +120,5 @@ ISW/
 
 ## Criterio de Línea Base
 
-- **LB1 (Inicial):** Se marca al completar la estructura de directorios, reglas de nombrado e integración de los integrantes en el repositorio.
-- **LB de Entregables:** Se creará un Tag / Release en Git al finalizar cada Trabajo Práctico Evaluable.
-- **LB de Evaluaciones:** Se establecerá una Línea Base antes de la fecha de cada Parcial y examen Final.
+- **Release v1 (Inicial):** Se marca al completar la estructura de directorios, reglas de nombrado e integración de los integrantes en el repositorio.
+- **Release de Entregables:** Se creará un Tag / Release en Git al recibir las notas y/o devoluciones de cada examen parcial.
