@@ -120,5 +120,5 @@ ISW/
 
 ## Criterio de Línea Base
 
-- **Release v1 (Inicial):** Se marca al completar la estructura de directorios, reglas de nombrado e integración de los integrantes en el repositorio.
-- **Release de Entregables:** Se creará un Tag / Release en Git al recibir las notas y/o devoluciones de cada examen parcial.
+- **Release_v1 (Inicial):** Se marca al completar la estructura de directorios, reglas de nombrado e integración de los integrantes en el repositorio.
+- **Release de Entregable:** Se creará un Tag / Release en Git al recibir las notas y/o devoluciones de cada examen parcial.
