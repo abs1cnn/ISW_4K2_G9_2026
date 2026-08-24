@@ -22,7 +22,7 @@ Grupo 9
 
 | Nombre                                 | Regla de nombrado                           | Ubicación                                             | Extensiones admitidas                                  |
 | -------------------------------------- | ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| **Configuración**               | `ISW_[nombre_del_documento].[extensión]` | `00_Configuracion/`                                  | `.pdf`                                               |
+| **Configuración**               | `ISW_[nombre_del_documento].[extensión]` | `00_Configuracion/`                                  | `.pdf`, `.md`                                               |
 | **Libros**                       | `[titulo_del_libro].[extensión]`         | `01_Bibliografia/Libros/`                            | `.pdf`, `.epub`, `.docx`                         |
 | **Papers**                       | `[titulo_del_paper].[extensión]`         | `01_Bibliografia/Papers/`                            | `.pdf`                                               |
 | **Material complementario**      | `[tema].[extensión]`                     | `01_Bibliografia/Material_Complementario/`           | `.pdf`, `.docx`, `.pptx`, `.xlsx`              |
