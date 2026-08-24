@@ -115,7 +115,6 @@ ISW/
 | Res     | Resumen de contenido               |
 | Ej      | Ejercicio Práctico                |
 | Entrega | Entrega final de Trabajo Práctico |
-| LB      | Línea Base de Configuración      |
 | Nro     | Número                            |
 
 ## Criterio de Línea Base
