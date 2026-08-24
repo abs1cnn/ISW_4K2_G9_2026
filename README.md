@@ -15,6 +15,7 @@ Grupo 9
 - 63903 - Rodríguez, Fernando Marcos
 - 86424 - Dagum , Braian David
 - 86199 - Ladux, Carlos Agustin
+- 90891 - Mansilla, Benjamin Felipe
 
 # Reglas de nombrado
 
@@ -102,3 +103,22 @@ ISW/
         ├── Desarrollo/
         └── Entrega/
 ```
+
+## Glosario
+
+| Sigla | Descripción |
+| --- | --- |
+| ISW | Ingeniería y Calidad de Software |
+| TP | Trabajo Práctico |
+| TI | Trabajo de Investigación |
+| U | Unidad Temática de la Materia |
+| Res | Resumen de contenido |
+| Ej | Ejercicio Práctico |
+| Entrega | Entrega final de Trabajo Práctico |
+| LB | Línea Base de Configuración |
+
+## Criterio de Línea Base
+
+- **LB1 (Inicial):** Se marca al completar la estructura de directorios, reglas de nombrado e integración de los integrantes en el repositorio.
+- **LB de Entregables:** Se creará un Tag / Release en Git al finalizar cada Trabajo Práctico Evaluable.
+- **LB de Evaluaciones:** Se establecerá una Línea Base antes de la fecha de cada Parcial y examen Final.
