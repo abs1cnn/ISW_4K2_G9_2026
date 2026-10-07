@@ -1,0 +1,75 @@
+:root {
+  --verde: #2e7d32;
+  --verde-claro: #e8f5e9;
+  --texto: #1b1b1b;
+  --borde: #c8d6c9;
+  --error: #c62828;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texto);
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; background: #f4faf4; }
+
+.app { position: relative; min-height: 100vh; }
+.app { padding-bottom: 76px; }
+
+.fondo-lineas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+.encabezado, .contenido { position: relative; z-index: 1; }
+
+.encabezado {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; background: var(--verde); color: white;
+}
+
+.nav-inferior {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; justify-content: space-around;
+  background: white; border-top: 1px solid var(--borde);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: transparent; color: #7a8a7b; font-size: 0.75rem; padding: 6px 4px;
+}
+.nav-item svg { width: 24px; height: 24px; }
+.nav-item.activo { color: var(--verde); font-weight: 600; }
+.encabezado h1 { font-size: 1.3rem; margin: 0; }
+.sesion { display: flex; gap: 12px; align-items: center; font-size: 0.9rem; }
+
+.contenido { display: flex; justify-content: center; padding: 24px 16px; }
+
+.tarjeta {
+  width: 100%; max-width: 480px; background: white; border-radius: 12px;
+  padding: 24px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tarjeta h2 { margin: 0 0 4px; color: var(--verde); }
+
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.95rem; }
+label.opcion { flex-direction: row; align-items: center; gap: 8px; }
+small, .ayuda { color: #666; font-size: 0.85rem; }
+
+input:not([type='radio']) {
+  padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: 1rem;
+}
+
+fieldset { border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px; }
+legend { padding: 0 4px; font-weight: 600; }
+.edades { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+
+button {
+  padding: 10px 14px; border: none; border-radius: 6px; background: var(--verde);
+  color: white; font-size: 1rem; cursor: pointer;
+}
+button:hover { opacity: 0.9; }
+.boton-secundario { background: transparent; border: 1px solid white; padding: 6px 10px; font-size: 0.85rem; }
+
+.total { font-size: 1.1rem; font-weight: 600; margin: 0; }
+.error { color: var(--error); margin: 0; font-size: 0.9rem; }
+ul.error { padding-left: 18px; }
