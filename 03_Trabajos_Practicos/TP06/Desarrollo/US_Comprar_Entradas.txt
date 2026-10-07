@@ -1,0 +1,90 @@
+===========================================================================
+USER STORY: COMPRAR ENTRADAS                                   Estimación: 8
+===========================================================================
+
+COMO visitante
+QUIERO comprar una entrada
+PARA asegurar mi visita al parque
+
+---------------------------------------------------------------------------
+CRITERIOS DE ACEPTACIÓN
+---------------------------------------------------------------------------
+- Debe indicar la fecha de visita deseada, la cantidad de entradas
+  requeridas, la edad de cada visitante y tipo de pase (VIP o regular).
+- La fecha de visita guiada puede ser del día actual o futuro.
+- Debe enviar un mensaje de confirmación vía mail.
+- Debe redirigir a Mercado Pago al confirmar la compra si el pago es con
+  tarjeta de crédito.
+- La fecha de la visita debe estar dentro de los días en que el parque
+  está abierto.
+- Debe seleccionar la forma de pago: efectivo en caso de querer pagar en
+  boletería o con tarjeta.
+- La cantidad de entradas requeridas no debe ser mayor a 10.
+- Al finalizar la compra se debe informar la cantidad de entradas
+  compradas y la fecha.
+- Se debe permitir la compra de entradas solo a usuarios registrados.
+
+---------------------------------------------------------------------------
+PRUEBAS DE USUARIO
+---------------------------------------------------------------------------
+
+[Originales]
+
+1.  Probar comprar una entrada indicando la fecha de visita dentro de los
+    días disponibles, una cantidad de entradas menor a 10, la edad de todos
+    los visitantes, el tipo de pase, la forma de pago con tarjeta mediante
+    Mercado Pago y recepción del mail de confirmación (pasa).
+2.  Probar comprar entradas sin seleccionar forma de pago (falla).
+3.  Probar comprar entradas ingresando una fecha de visita en la cual el
+    parque se encuentra cerrado (falla).
+4.  Probar comprar entradas ingresando una cantidad de entradas mayor a 10
+    (falla).
+
+[Agregadas]
+
+-- Caminos felices --
+5.  Probar comprar entradas con fecha de visita dentro de los días
+    disponibles, cantidad válida, edad de todos los visitantes, tipo de
+    pase y forma de pago en efectivo; se confirma la compra sin redirigir
+    a Mercado Pago y se recibe el mail de confirmación (pasa).
+6.  Probar comprar entradas con fecha de visita igual al día actual,
+    estando el parque abierto ese día (pasa).
+7.  Probar comprar exactamente 10 entradas (valor límite) (pasa).
+8.  Probar comprar exactamente 1 entrada (valor límite inferior) (pasa).
+9.  Probar comprar entradas con tipo de pase VIP (pasa).
+10. Probar comprar entradas con tipo de pase regular (pasa).
+11. Probar que al finalizar la compra se informe la cantidad de entradas
+    compradas y la fecha de visita (pasa).
+
+-- Usuario --
+12. Probar comprar entradas sin estar registrado / sin iniciar sesión
+    (falla).
+
+-- Fecha --
+13. Probar comprar entradas ingresando una fecha de visita pasada (falla).
+14. Probar comprar entradas sin ingresar fecha de visita (falla).
+
+-- Cantidad --
+15. Probar comprar entradas ingresando cantidad 0 (falla).
+16. Probar comprar entradas ingresando una cantidad negativa (falla).
+17. Probar comprar 11 entradas (valor límite superior + 1) (falla).
+
+-- Visitantes / edades --
+18. Probar comprar entradas sin indicar la edad de alguno de los
+    visitantes (falla).
+19. Probar comprar entradas donde la cantidad de edades ingresadas no
+    coincide con la cantidad de entradas solicitadas (falla).
+20. Probar comprar entradas ingresando una edad inválida (negativa o
+    no numérica) (falla).
+
+-- Tipo de pase --
+21. Probar comprar entradas sin seleccionar tipo de pase (falla).
+22. Probar comprar entradas con un tipo de pase distinto de VIP o regular
+    (falla).
+
+-- Forma de pago --
+23. Probar comprar entradas con una forma de pago distinta de efectivo o
+    tarjeta (falla).
+24. Probar comprar entradas con tarjeta y que Mercado Pago rechace el
+    pago; no se registra la compra ni se envía el mail de confirmación
+    (falla).

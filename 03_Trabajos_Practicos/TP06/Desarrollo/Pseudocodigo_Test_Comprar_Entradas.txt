@@ -1,0 +1,196 @@
+===========================================================================
+PSEUDOCÓDIGO - TESTS DE "COMPRAR ENTRADAS" (TDD)
+===========================================================================
+Estilo pytest. Cada test sigue el esquema Arrange / Act / Assert.
+Los servicios externos (mail y Mercado Pago) se reemplazan por dobles
+(mocks) para poder verificar si fueron llamados sin depender de ellos.
+
+
+---------------------------------------------------------------------------
+1. DATOS Y DOBLES DE PRUEBA (fixtures)
+---------------------------------------------------------------------------
+
+HOY            = fecha(2026, 10, 7)
+FECHA_ABIERTO  = HOY + 3 dias          # día en que el parque abre
+FECHA_CERRADO  = un lunes futuro       # día en que el parque NO abre
+FECHA_PASADA   = HOY - 1 dia
+
+def usuario_registrado():
+    return Usuario(email="visitante@mail.com", registrado=True)
+
+def usuario_no_registrado():
+    return Usuario(email="anonimo@mail.com", registrado=False)
+
+def calendario_parque():
+    # el parque abre de martes a domingo
+    return Calendario(dias_abierto=[MAR, MIE, JUE, VIE, SAB, DOM])
+
+def servicio_mail_mock():
+    return Mock(ServicioMail)          # registra si se llamó a enviar()
+
+def mercado_pago_mock(aprueba=True):
+    mp = Mock(MercadoPago)
+    mp.cobrar.devuelve(aprueba)
+    return mp
+
+def crear_servicio_compra(mail, mp):
+    return ServicioCompra(
+        calendario = calendario_parque(),
+        mail       = mail,
+        pasarela   = mp,
+        reloj      = RelojFijo(HOY)    # fecha "actual" controlada
+    )
+
+def pedido_valido(**cambios):
+    # pedido base válido; cada test pisa solo lo que quiere probar
+    pedido = {
+        usuario     : usuario_registrado(),
+        fecha       : FECHA_ABIERTO,
+        cantidad    : 2,
+        edades      : [30, 8],
+        tipo_pase   : "REGULAR",
+        forma_pago  : "TARJETA"
+    }
+    pedido.actualizar(cambios)
+    return pedido
+
+
+---------------------------------------------------------------------------
+2. TEST PRINCIPAL (camino feliz con tarjeta)
+---------------------------------------------------------------------------
+
+def test_comprar_entradas():
+    # Arrange
+    mail    = servicio_mail_mock()
+    mp      = mercado_pago_mock(aprueba=True)
+    servicio = crear_servicio_compra(mail, mp)
+    pedido   = pedido_valido(cantidad=3, edades=[40, 35, 10],
+                             tipo_pase="VIP", forma_pago="TARJETA")
+
+    # Act
+    resultado = servicio.comprar(pedido)
+
+    # Assert
+    assert resultado.exitosa == True
+    assert resultado.cantidad == 3
+    assert resultado.fecha == FECHA_ABIERTO
+    assert mp.cobrar fue llamado 1 vez
+    assert mail.enviar fue llamado 1 vez con destinatario "visitante@mail.com"
+
+
+---------------------------------------------------------------------------
+3. OTROS CAMINOS FELICES
+---------------------------------------------------------------------------
+
+def test_comprar_entradas_en_efectivo_no_redirige_a_mercado_pago():
+    mail, mp = servicio_mail_mock(), mercado_pago_mock()
+    servicio = crear_servicio_compra(mail, mp)
+
+    resultado = servicio.comprar(pedido_valido(forma_pago="EFECTIVO"))
+
+    assert resultado.exitosa == True
+    assert mp.cobrar NO fue llamado
+    assert mail.enviar fue llamado 1 vez
+
+def test_comprar_entradas_para_el_dia_actual():
+    # precondición: HOY es un día abierto
+    resultado = servicio.comprar(pedido_valido(fecha=HOY))
+    assert resultado.exitosa == True
+
+def test_comprar_10_entradas_limite_superior():
+    resultado = servicio.comprar(pedido_valido(cantidad=10, edades=[20]*10))
+    assert resultado.exitosa == True
+
+def test_comprar_1_entrada_limite_inferior():
+    resultado = servicio.comprar(pedido_valido(cantidad=1, edades=[25]))
+    assert resultado.exitosa == True
+
+@parametrizar("tipo_pase", ["VIP", "REGULAR"])
+def test_comprar_entradas_con_tipo_de_pase_valido(tipo_pase):
+    resultado = servicio.comprar(pedido_valido(tipo_pase=tipo_pase))
+    assert resultado.exitosa == True
+
+def test_comprar_entradas_informa_cantidad_y_fecha():
+    resultado = servicio.comprar(pedido_valido(cantidad=2))
+    assert resultado.mensaje contiene "2 entradas"
+    assert resultado.mensaje contiene FECHA_ABIERTO
+
+
+---------------------------------------------------------------------------
+4. CASOS QUE DEBEN FALLAR
+---------------------------------------------------------------------------
+Patrón común:
+    with esperar_error(TipoDeError):
+        servicio.comprar(pedido_invalido)
+    assert mp.cobrar NO fue llamado
+    assert mail.enviar NO fue llamado
+
+def test_comprar_entradas_usuario_no_registrado_falla():
+    with esperar_error(UsuarioNoRegistradoError):
+        servicio.comprar(pedido_valido(usuario=usuario_no_registrado()))
+
+def test_comprar_entradas_sin_forma_de_pago_falla():
+    with esperar_error(FormaDePagoRequeridaError):
+        servicio.comprar(pedido_valido(forma_pago=None))
+
+def test_comprar_entradas_forma_de_pago_invalida_falla():
+    with esperar_error(FormaDePagoInvalidaError):
+        servicio.comprar(pedido_valido(forma_pago="CRIPTO"))
+
+def test_comprar_entradas_parque_cerrado_falla():
+    with esperar_error(ParqueCerradoError):
+        servicio.comprar(pedido_valido(fecha=FECHA_CERRADO))
+
+def test_comprar_entradas_fecha_pasada_falla():
+    with esperar_error(FechaInvalidaError):
+        servicio.comprar(pedido_valido(fecha=FECHA_PASADA))
+
+def test_comprar_entradas_sin_fecha_falla():
+    with esperar_error(FechaInvalidaError):
+        servicio.comprar(pedido_valido(fecha=None))
+
+@parametrizar("cantidad", [0, -1, 11])
+def test_comprar_entradas_cantidad_invalida_falla(cantidad):
+    with esperar_error(CantidadInvalidaError):
+        servicio.comprar(pedido_valido(cantidad=cantidad,
+                                       edades=[20]*max(cantidad, 0)))
+
+def test_comprar_entradas_edades_no_coinciden_con_cantidad_falla():
+    with esperar_error(EdadesInvalidasError):
+        servicio.comprar(pedido_valido(cantidad=3, edades=[30, 8]))
+
+@parametrizar("edades", [[30, None], [30, -5], [30, "abc"]])
+def test_comprar_entradas_edad_invalida_falla(edades):
+    with esperar_error(EdadesInvalidasError):
+        servicio.comprar(pedido_valido(cantidad=2, edades=edades))
+
+@parametrizar("tipo_pase", [None, "PREMIUM"])
+def test_comprar_entradas_tipo_pase_invalido_falla(tipo_pase):
+    with esperar_error(TipoPaseInvalidoError):
+        servicio.comprar(pedido_valido(tipo_pase=tipo_pase))
+
+def test_comprar_entradas_pago_rechazado_por_mercado_pago_falla():
+    mail = servicio_mail_mock()
+    mp   = mercado_pago_mock(aprueba=False)
+    servicio = crear_servicio_compra(mail, mp)
+
+    with esperar_error(PagoRechazadoError):
+        servicio.comprar(pedido_valido(forma_pago="TARJETA"))
+
+    assert mp.cobrar fue llamado 1 vez
+    assert mail.enviar NO fue llamado
+
+
+---------------------------------------------------------------------------
+5. ORDEN SUGERIDO PARA EL CICLO TDD (Red -> Green -> Refactor)
+---------------------------------------------------------------------------
+ 1. test_comprar_entradas (camino feliz mínimo, sin mocks aún)
+ 2. usuario no registrado
+ 3. cantidad inválida (0, -1, 11) y límites (1, 10)
+ 4. fecha: pasada, sin fecha, parque cerrado, día actual
+ 5. edades y tipo de pase
+ 6. forma de pago (sin forma, inválida, efectivo)
+ 7. integración con Mercado Pago (mock) y pago rechazado
+ 8. envío de mail (mock) e informe de cantidad y fecha
+Después de cada Green: refactorizar (extraer validadores, constantes como
+MAX_ENTRADAS = 10, enums para TipoPase y FormaPago) sin romper los tests.
