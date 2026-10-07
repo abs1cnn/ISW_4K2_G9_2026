@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoHarmony Panel</title>
+  <style>
+    :root {
+      --verde: #2e7d32; --verde-claro: #e8f5e9; --borde: #c8d6c9;
+      --ok: #2e7d32; --falla: #c62828; --texto: #1b1b1b; --gris: #666;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: var(--texto);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4faf4; }
+    header { background: var(--verde); color: white; padding: 14px 16px; }
+    header h1 { margin: 0; font-size: 1.3rem; }
+    header p { margin: 4px 0 0; opacity: 0.85; font-size: 0.9rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 20px; }
+    .botones { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    button, a.boton {
+      display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left;
+      padding: 16px; border: none; border-radius: 10px; background: var(--verde); color: white;
+      font-size: 1.05rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    a.boton { background: white; color: var(--verde); border: 2px solid var(--verde); }
+    button small, a.boton small { font-weight: 400; font-size: 0.85rem; opacity: 0.85; }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    section { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    section h2 { margin: 0 0 12px; font-size: 1.1rem; color: var(--verde); }
+    .resumen { font-weight: 600; margin-bottom: 10px; }
+    .resumen.ok { color: var(--ok); } .resumen.falla { color: var(--falla); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eee; }
+    th { color: var(--gris); font-weight: 600; }
+    td.PASSED { color: var(--ok); font-weight: 600; } td.FAILED { color: var(--falla); font-weight: 600; }
+    .tabla { overflow-x: auto; }
+    h3.grupo { font-size: 1rem; margin: 18px 0 6px; display: flex; gap: 8px; align-items: center; }
+    h3.grupo span { font-size: 0.85rem; padding: 2px 8px; border-radius: 10px; background: var(--verde-claro); }
+    h3.grupo span.ok { color: var(--ok); } h3.grupo span.falla { color: var(--falla); background: #ffebee; }
+    pre { background: #1e1e1e; color: #ddd; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; max-height: 400px; }
+    .vacio { color: var(--gris); }
+    details summary { cursor: pointer; color: var(--gris); margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>EcoHarmony Park · Panel del backend</h1>
+    <p>US "Comprar entradas" — pago en efectivo en boletería</p>
+  </header>
+
+  <main>
+    <div class="botones">
+      <button id="btn-test">
+        Comprar entradas (test)
+        <small>Ejecuta la suite de pytest y muestra el resultado</small>
+      </button>
+      <a class="boton" href="http://localhost:5173" target="_blank" rel="noopener">
+        Comprar entradas
+        <small>Abre el frontend para probar la funcionalidad</small>
+      </a>
+    </div>
+
+    <section id="seccion-tests" hidden>
+      <h2>Resultado de los tests</h2>
+      <div id="resumen" class="resumen"></div>
+      <div id="grupos-tests"></div>
+      <details>
+        <summary>Ver salida completa de pytest</summary>
+        <pre id="salida"></pre>
+      </details>
+    </section>
+
+    <section>
+      <h2>Compras registradas <button id="btn-refrescar" style="display:inline;padding:4px 10px;font-size:0.8rem;margin-left:8px">Actualizar</button></h2>
+      <div class="tabla">
+        <table>
+          <thead><tr><th>N°</th><th>Mail</th><th>Fecha visita</th><th>Cant.</th><th>Pase</th><th>Total</th><th>Estado</th><th>Creada</th></tr></thead>
+          <tbody id="tabla-compras"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const escapar = (texto) =>
+      String(texto).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function renderGrupos(tests) {
+      const grupos = {};
+      tests.forEach((t) => (grupos[t.tipo] ??= []).push(t));
+
+      return Object.entries(grupos).map(([tipo, lista]) => {
+        const pasaron = lista.filter((t) => t.resultado === 'PASSED').length;
+        const ok = pasaron === lista.length;
+        return `
+          <h3 class="grupo">${escapar(tipo)} <span class="${ok ? 'ok' : 'falla'}">${pasaron}/${lista.length}</span></h3>
+          <div class="tabla">
+            <table>
+              <thead><tr><th>Archivo</th><th>Test</th><th>Resultado</th><th>Tiempo</th></tr></thead>
+              <tbody>${lista.map((t) => `
+                <tr>
+                  <td>${escapar(t.archivo)}</td>
+                  <td>${escapar(t.nombre)}</td>
+                  <td class="${t.resultado}">${t.resultado === 'PASSED' ? '✓ PASÓ' : t.resultado === 'FAILED' ? '✗ FALLÓ' : t.resultado}</td>
+                  <td>${(t.duracion * 1000).toFixed(1)} ms</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>`;
+      }).join('');
+    }
+
+    async function correrTests() {
+      const boton = document.getElementById('btn-test');
+      const resumen = document.getElementById('resumen');
+      boton.disabled = true;
+      document.getElementById('seccion-tests').hidden = false;
+      resumen.className = 'resumen';
+      resumen.textContent = 'Ejecutando tests...';
+      document.getElementById('grupos-tests').innerHTML = '';
+
+      try {
+        const respuesta = await fetch('/api/tests/ejecutar', { method: 'POST' });
+        const r = await respuesta.json();
+        resumen.className = 'resumen ' + (r.exitoso ? 'ok' : 'falla');
+        resumen.textContent = `${r.pasaron} pasaron · ${r.fallaron} fallaron · ${r.total} en total`;
+        document.getElementById('grupos-tests').innerHTML = renderGrupos(r.tests);
+        document.getElementById('salida').textContent = r.salida;
+      } catch (e) {
+        resumen.className = 'resumen falla';
+        resumen.textContent = 'No se pudieron ejecutar los tests: ' + e.message;
+      } finally {
+        boton.disabled = false;
+      }
+    }
+
+    async function cargarCompras() {
+      const compras = await (await fetch('/api/compras')).json();
+      const tbody = document.getElementById('tabla-compras');
+      tbody.innerHTML = compras.length === 0
+        ? '<tr><td colspan="8" class="vacio">Todavía no hay compras.</td></tr>'
+        : compras.map((c) => `
+          <tr>
+            <td>${c.id}</td><td>${escapar(c.email)}</td><td>${escapar(c.fecha_visita)}</td>
+            <td>${c.cantidad}</td><td>${escapar(c.tipo_pase)}</td><td>$${c.total}</td>
+            <td>${escapar(c.estado)}</td><td>${escapar(c.creada_en)}</td>
+          </tr>`).join('');
+    }
+
+    document.getElementById('btn-test').addEventListener('click', correrTests);
+    document.getElementById('btn-refrescar').addEventListener('click', cargarCompras);
+    cargarCompras();
+  </script>
+</body>
+</html>
