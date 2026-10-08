@@ -14,7 +14,7 @@ def pedido_valido(**cambios) -> Pedido:
     datos = {
         "email": "visitante@ecoharmony.com",
         "fecha": FECHA_ABIERTO,
-        "cantidad": 11,
+        "cantidad": 2,
         "edades": [30, 8],
         "tipo_pase": "REGULAR",
         "forma_pago": "EFECTIVO",

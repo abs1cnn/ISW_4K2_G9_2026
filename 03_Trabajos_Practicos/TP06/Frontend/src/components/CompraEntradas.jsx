@@ -6,6 +6,7 @@ import {
   PRECIOS,
   FORMAS_PAGO,
   calcularTotal,
+  validarPedido,
   comprarEntradas,
   CompraInvalidaError,
 } from '../services/compraService';
@@ -42,7 +43,7 @@ export default function CompraEntradas({ onCompra }) {
     if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const pedido = {
       email,
@@ -52,8 +53,56 @@ export default function CompraEntradas({ onCompra }) {
       tipoPase,
       formaPago,
     };
+
+    // Validamos primero localmente con las reglas de negocio
+    const erroresLocales = validarPedido(pedido);
+    if (erroresLocales.length > 0) {
+      setErrores(erroresLocales);
+      return;
+    }
+
+    // Intentamos persistir en el backend si está activo
+    try {
+      const respuesta = await fetch('/api/compras', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: pedido.email,
+          fecha: pedido.fecha,
+          cantidad: pedido.cantidad,
+          edades: pedido.edades,
+          tipo_pase: pedido.tipoPase,
+          forma_pago: pedido.formaPago,
+        }),
+      });
+
+      if (respuesta.ok) {
+        const datos = await respuesta.json();
+        onCompra({
+          id: datos.id,
+          email: datos.email,
+          fecha: datos.fecha,
+          cantidad: datos.cantidad,
+          tipoPase: datos.tipo_pase,
+          formaPago: datos.forma_pago,
+          total: datos.total,
+        });
+        setErrores([]);
+        return;
+      }
+
+      if (respuesta.status === 422) {
+        const errorData = await respuesta.json();
+        setErrores(errorData.errores || ['Error al procesar la compra']);
+        return;
+      }
+    } catch {
+      // Backend no disponible: fallback al servicio local
+    }
+
     try {
       onCompra(comprarEntradas(pedido, { enviarMail }));
+      setErrores([]);
     } catch (err) {
       if (err instanceof CompraInvalidaError) setErrores(err.errores);
       else throw err;
