@@ -50,6 +50,15 @@ describe('comprarEntradas - casos que pasan', () => {
     expect(enviarMail).toHaveBeenCalledWith('visitante@ecoharmony.com', expect.stringContaining('3 entradas'));
   });
 
+  it('acepta pago con tarjeta e informa el pago por Mercado Pago en el mail', () => {
+    const enviarMail = vi.fn();
+
+    const resultado = comprar(pedidoValido({ formaPago: 'TARJETA' }), enviarMail);
+
+    expect(resultado.formaPago).toBe('TARJETA');
+    expect(enviarMail).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('Mercado Pago'));
+  });
+
   it('permite comprar para el día actual', () => {
     expect(comprar(pedidoValido({ fecha: '2026-10-07' })).cantidad).toBe(2);
   });
@@ -83,8 +92,8 @@ describe('comprarEntradas - casos que fallan', () => {
     esperarError(pedidoValido({ formaPago: null }), 'forma de pago');
   });
 
-  it('falla con forma de pago distinta de efectivo', () => {
-    esperarError(pedidoValido({ formaPago: 'TARJETA' }), 'Forma de pago no admitida');
+  it('falla con forma de pago distinta de efectivo o tarjeta', () => {
+    esperarError(pedidoValido({ formaPago: 'CRIPTO' }), 'Forma de pago no admitida');
   });
 
   it('falla si el parque está cerrado', () => {

@@ -7,10 +7,8 @@ import {
   FORMAS_PAGO,
   calcularTotal,
   validarPedido,
-  comprarEntradas,
-  CompraInvalidaError,
 } from '../services/compraService';
-import { enviarMail } from '../services/mailService';
+import Registro from './Registro';
 
 function hoyComoTexto() {
   const hoy = new Date();
@@ -27,6 +25,7 @@ export default function CompraEntradas({ onCompra }) {
   const [tipoPase, setTipoPase] = useState(TIPOS_PASE.REGULAR);
   const [formaPago, setFormaPago] = useState('');
   const [errores, setErrores] = useState([]);
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
 
   function cambiarCantidad(valor) {
     // No se permiten negativos ni cero: se fuerza el rango 1..MAX_ENTRADAS
@@ -61,7 +60,7 @@ export default function CompraEntradas({ onCompra }) {
       return;
     }
 
-    // Intentamos persistir en el backend si está activo
+    // El backend es la fuente de verdad: valida usuario registrado, cobra y envía el mail
     try {
       const respuesta = await fetch('/api/compras', {
         method: 'POST',
@@ -86,6 +85,7 @@ export default function CompraEntradas({ onCompra }) {
           tipoPase: datos.tipo_pase,
           formaPago: datos.forma_pago,
           total: datos.total,
+          urlMercadoPago: datos.url_mercado_pago,
         });
         setErrores([]);
         return;
@@ -96,16 +96,9 @@ export default function CompraEntradas({ onCompra }) {
         setErrores(errorData.errores || ['Error al procesar la compra']);
         return;
       }
+      setErrores(['No se pudo procesar la compra, intentá de nuevo']);
     } catch {
-      // Backend no disponible: fallback al servicio local
-    }
-
-    try {
-      onCompra(comprarEntradas(pedido, { enviarMail }));
-      setErrores([]);
-    } catch (err) {
-      if (err instanceof CompraInvalidaError) setErrores(err.errores);
-      else throw err;
+      setErrores(['No hay conexión con el servidor, intentá de nuevo']);
     }
   }
 
@@ -190,6 +183,16 @@ export default function CompraEntradas({ onCompra }) {
           />
           Efectivo (pago en boletería)
         </label>
+        <label className="opcion">
+          <input
+            type="radio"
+            name="formaPago"
+            value={FORMAS_PAGO.TARJETA}
+            checked={formaPago === FORMAS_PAGO.TARJETA}
+            onChange={() => setFormaPago(FORMAS_PAGO.TARJETA)}
+          />
+          Tarjeta de crédito (se redirige a Mercado Pago)
+        </label>
       </fieldset>
 
       <p className="total">Total: ${calcularTotal(cantidad, tipoPase)}</p>
@@ -203,6 +206,11 @@ export default function CompraEntradas({ onCompra }) {
       )}
 
       <button type="submit">Confirmar compra</button>
+
+      <button type="button" onClick={() => setMostrarRegistro((visible) => !visible)}>
+        ¿No tenés cuenta? Registrate
+      </button>
+      {mostrarRegistro && <Registro emailInicial={email} onRegistrado={() => setMostrarRegistro(false)} />}
     </form>
   );
 }

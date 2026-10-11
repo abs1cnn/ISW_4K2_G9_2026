@@ -11,9 +11,9 @@ export const PRECIOS = {
   [TIPOS_PASE.VIP]: 10000,
 };
 
-// Por ahora solo se admite pago en efectivo (en boletería)
 export const FORMAS_PAGO = {
-  EFECTIVO: 'EFECTIVO',
+  EFECTIVO: 'EFECTIVO', // se paga en boletería
+  TARJETA: 'TARJETA', // se redirige a Mercado Pago
 };
 
 // 0 = domingo ... 6 = sábado. El parque cierra los lunes.
@@ -118,10 +118,13 @@ export function comprarEntradas(pedido, { hoy = new Date(), enviarMail } = {}) {
   };
 
   if (enviarMail) {
+    const pago =
+      resultado.formaPago === FORMAS_PAGO.TARJETA
+        ? `Pagaste $${resultado.total} con tarjeta por Mercado Pago`
+        : `Total a pagar en boletería: $${resultado.total}`;
     enviarMail(
       resultado.email,
-      `Compraste ${resultado.cantidad} entradas para el ${formatearFecha(resultado.fecha)}. ` +
-        `Total a pagar en boletería: $${resultado.total}`
+      `Compraste ${resultado.cantidad} entradas para el ${formatearFecha(resultado.fecha)}. ${pago}`
     );
   }
 

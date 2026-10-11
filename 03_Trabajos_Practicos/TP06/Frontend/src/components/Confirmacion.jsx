@@ -16,9 +16,19 @@ export default function Confirmacion({ compra, onNuevaCompra }) {
         <strong>{compra.tipoPase === 'VIP' ? 'VIP' : plural ? 'regulares' : 'regular'}</strong> para el{' '}
         <strong>{formatearFecha(compra.fecha)}</strong>.
       </p>
-      <p>
-        Total a pagar en boletería: <strong>${compra.total}</strong>
-      </p>
+      {compra.urlMercadoPago ? (
+        <p>
+          Total: <strong>${compra.total}</strong>. Pagá con tarjeta en{' '}
+          <a href={compra.urlMercadoPago} target="_blank" rel="noreferrer">
+            Mercado Pago
+          </a>
+          .
+        </p>
+      ) : (
+        <p>
+          Total a pagar en boletería: <strong>${compra.total}</strong>
+        </p>
+      )}
       <p className="ayuda">Te enviamos un mail de confirmación a {compra.email}.</p>
       <button onClick={onNuevaCompra}>Nueva compra</button>
     </div>
