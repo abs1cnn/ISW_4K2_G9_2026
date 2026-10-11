@@ -17,11 +17,12 @@ PRECIOS = {
     TIPO_PASE_VIP: 10000,
 }
 
-# Por ahora solo se admite pago en efectivo (en boletería)
-FORMA_PAGO_EFECTIVO = "EFECTIVO"
-FORMAS_PAGO = (FORMA_PAGO_EFECTIVO,)
+FORMA_PAGO_EFECTIVO = "EFECTIVO"  # se paga en boletería
+FORMA_PAGO_TARJETA = "TARJETA"    # se cobra por Mercado Pago
+FORMAS_PAGO = (FORMA_PAGO_EFECTIVO, FORMA_PAGO_TARJETA)
 
 ESTADO_PENDIENTE_PAGO = "PENDIENTE_PAGO_BOLETERIA"
+ESTADO_PAGADA = "PAGADA"
 
 # date.weekday(): 0 = lunes ... 6 = domingo. El parque cierra los lunes.
 DIAS_ABIERTO = (1, 2, 3, 4, 5, 6)
@@ -128,10 +129,14 @@ def comprar_entradas(
     hoy: date,
     guardar_compra: Callable[[Compra], int],
     enviar_mail: Callable[[str, str], None],
+    cobrar: Callable[[Compra], bool],
+    usuario_registrado: Callable[[str], bool],
 ) -> Compra:
     errores = validar_pedido(pedido, hoy)
     if errores:
         raise CompraInvalidaError(errores)
+    if not usuario_registrado(pedido.email.strip()):
+        raise CompraInvalidaError(["Solo los usuarios registrados pueden comprar entradas"])
 
     compra = Compra(
         email=pedido.email.strip(),
@@ -142,10 +147,23 @@ def comprar_entradas(
         forma_pago=pedido.forma_pago,
         total=calcular_total(pedido.cantidad, pedido.tipo_pase),
     )
+    if compra.forma_pago == FORMA_PAGO_TARJETA:
+        if not cobrar(compra):
+            raise CompraInvalidaError(["El pago fue rechazado por Mercado Pago. No se registró la compra"])
+        compra.estado = ESTADO_PAGADA
+
     compra.id = guardar_compra(compra)
-    compra.mensaje = (
-        f"Compraste {compra.cantidad} entradas para el {compra.fecha.strftime('%d/%m/%Y')}. "
-        f"Acercate a boletería a pagar ${compra.total} en efectivo. N° de compra: {compra.id}"
-    )
+    compra.mensaje = _armar_mensaje(compra)
     enviar_mail(compra.email, compra.mensaje)
     return compra
+
+
+def _armar_mensaje(compra: Compra) -> str:
+    detalle = (
+        f"Compraste {compra.cantidad} entradas para el {compra.fecha.strftime('%d/%m/%Y')}. "
+    )
+    if compra.estado == ESTADO_PAGADA:
+        detalle += f"Pagaste ${compra.total} con tarjeta por Mercado Pago. "
+    else:
+        detalle += f"Acercate a boletería a pagar ${compra.total} en efectivo. "
+    return detalle + f"N° de compra: {compra.id}"

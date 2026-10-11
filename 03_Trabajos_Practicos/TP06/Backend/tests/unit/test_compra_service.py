@@ -1,26 +1,38 @@
-"""Tests unitarios de la US "Comprar entradas" (pago solo en efectivo)."""
+"""Tests unitarios de la US "Comprar entradas"."""
 
 import pytest
 
 from app.compra_service import (
+    ESTADO_PAGADA,
     ESTADO_PENDIENTE_PAGO,
     PRECIOS,
     CompraInvalidaError,
     calcular_total,
     comprar_entradas,
 )
+from tests.unit.conftest import MercadoPagoFalso
 from tests.conftest import FECHA_ABIERTO, FECHA_CERRADO, FECHA_PASADA, HOY, pedido_valido
 
 
-def comprar(pedido, repo):
-    return comprar_entradas(pedido, hoy=HOY, guardar_compra=repo.guardar_compra, enviar_mail=repo.enviar_mail)
+def comprar(pedido, repo, mp=None):
+    mp = mp or MercadoPagoFalso()
+    return comprar_entradas(
+        pedido,
+        hoy=HOY,
+        guardar_compra=repo.guardar_compra,
+        enviar_mail=repo.enviar_mail,
+        cobrar=mp.cobrar,
+        usuario_registrado=repo.usuario_registrado,
+    )
 
 
-def esperar_error(pedido, repo, texto_error):
+def esperar_error(pedido, repo, texto_error, mp=None):
+    mp = mp or MercadoPagoFalso()
     with pytest.raises(CompraInvalidaError, match=texto_error):
-        comprar(pedido, repo)
+        comprar(pedido, repo, mp)
     assert repo.compras == []
     assert repo.mails == []
+    return mp
 
 
 # ---------------------------------------------------------------- casos que pasan
@@ -36,6 +48,28 @@ def test_comprar_entradas(repo_falso):
     assert compra.total == 3 * PRECIOS["VIP"]
     assert compra.estado == ESTADO_PENDIENTE_PAGO
     assert len(repo_falso.compras) == 1
+
+
+def test_comprar_entradas_con_tarjeta_cobra_por_mercado_pago_y_queda_pagada(repo_falso, mp_falso):
+    pedido = pedido_valido(cantidad=3, edades=[40, 35, 10], tipo_pase="VIP", forma_pago="TARJETA")
+
+    compra = comprar(pedido, repo_falso, mp_falso)
+
+    assert len(mp_falso.cobros) == 1
+    assert mp_falso.cobros[0].total == 3 * PRECIOS["VIP"]
+    assert compra.estado == ESTADO_PAGADA
+    assert len(repo_falso.compras) == 1
+    assert len(repo_falso.mails) == 1
+    assert repo_falso.mails[0][0] == "visitante@ecoharmony.com"
+    assert "3 entradas" in repo_falso.mails[0][1]
+
+
+def test_comprar_entradas_en_efectivo_no_pasa_por_mercado_pago(repo_falso, mp_falso):
+    compra = comprar(pedido_valido(forma_pago="EFECTIVO"), repo_falso, mp_falso)
+
+    assert mp_falso.cobros == []
+    assert compra.estado == ESTADO_PENDIENTE_PAGO
+    assert len(repo_falso.mails) == 1
 
 
 def test_comprar_entradas_envia_mail_con_cantidad_fecha_y_boleteria(repo_falso):
@@ -86,8 +120,22 @@ def test_comprar_entradas_sin_forma_de_pago_falla(repo_falso):
     esperar_error(pedido_valido(forma_pago=None), repo_falso, "forma de pago")
 
 
-def test_comprar_entradas_con_tarjeta_falla(repo_falso):
-    esperar_error(pedido_valido(forma_pago="TARJETA"), repo_falso, "Forma de pago no admitida")
+def test_comprar_entradas_forma_de_pago_invalida_falla(repo_falso):
+    esperar_error(pedido_valido(forma_pago="CRIPTO"), repo_falso, "Forma de pago no admitida")
+
+
+def test_comprar_entradas_pago_rechazado_por_mercado_pago_falla(repo_falso):
+    mp = MercadoPagoFalso(aprueba=False)
+
+    esperar_error(pedido_valido(forma_pago="TARJETA"), repo_falso, "rechazado", mp)
+
+    assert len(mp.cobros) == 1
+
+
+def test_comprar_entradas_usuario_no_registrado_falla(repo_falso, mp_falso):
+    mp = esperar_error(pedido_valido(email="anonimo@mail.com", forma_pago="TARJETA"), repo_falso, "registrad", mp_falso)
+
+    assert mp.cobros == []
 
 
 def test_comprar_entradas_parque_cerrado_falla(repo_falso):
