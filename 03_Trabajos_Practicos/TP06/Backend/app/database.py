@@ -5,10 +5,18 @@ import sqlite3
 from pathlib import Path
 
 from app.compra_service import Compra
+from app.usuarios import hashear_password
 
 DB_PATH_DEFAULT = Path(__file__).resolve().parent.parent / "ecoharmony.db"
 
 ESQUEMA = """
+CREATE TABLE IF NOT EXISTS usuarios (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    email         TEXT    NOT NULL UNIQUE,
+    password_hash TEXT    NOT NULL,
+    creado_en     TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
 CREATE TABLE IF NOT EXISTS compras (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     email         TEXT    NOT NULL,
@@ -46,6 +54,25 @@ class Repositorio:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
+
+    def registrar_usuario(self, email: str, password: str) -> bool:
+        """Devuelve False si el mail ya estaba registrado."""
+        try:
+            with self._conectar() as conn:
+                conn.execute(
+                    "INSERT INTO usuarios (email, password_hash) VALUES (?, ?)",
+                    (email.strip().lower(), hashear_password(password)),
+                )
+        except sqlite3.IntegrityError:
+            return False
+        return True
+
+    def usuario_registrado(self, email: str) -> bool:
+        with self._conectar() as conn:
+            fila = conn.execute(
+                "SELECT 1 FROM usuarios WHERE email = ?", (email.strip().lower(),)
+            ).fetchone()
+        return fila is not None
 
     def guardar_compra(self, compra: Compra) -> int:
         with self._conectar() as conn:

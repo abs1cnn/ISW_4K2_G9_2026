@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from app.compra_service import (
     DIAS_ABIERTO,
+    FORMA_PAGO_TARJETA,
     EDAD_MAXIMA,
     FORMAS_PAGO,
     MAX_ENTRADAS,
@@ -18,7 +19,9 @@ from app.compra_service import (
     comprar_entradas,
 )
 from app.database import Repositorio, get_repositorio
+from app.mercado_pago import MercadoPagoSimulado, url_checkout
 from app.test_runner import ejecutar_tests
+from app.usuarios import validar_registro
 
 app = FastAPI(title="EcoHarmony Park - API")
 
@@ -42,8 +45,17 @@ class PedidoRequest(BaseModel):
     forma_pago: Optional[str] = None
 
 
+class UsuarioRequest(BaseModel):
+    email: Any = None
+    password: Any = None
+
+
 def get_hoy() -> date:
     return date.today()
+
+
+def get_pasarela() -> MercadoPagoSimulado:
+    return MercadoPagoSimulado()
 
 
 @app.get("/", include_in_schema=False)
@@ -67,6 +79,7 @@ def crear_compra(
     datos: PedidoRequest,
     repo: Repositorio = Depends(get_repositorio),
     hoy: date = Depends(get_hoy),
+    pasarela: MercadoPagoSimulado = Depends(get_pasarela),
 ):
     try:
         compra = comprar_entradas(
@@ -74,6 +87,8 @@ def crear_compra(
             hoy=hoy,
             guardar_compra=repo.guardar_compra,
             enviar_mail=repo.guardar_mail,
+            cobrar=pasarela.cobrar,
+            usuario_registrado=repo.usuario_registrado,
         )
     except CompraInvalidaError as error:
         return JSONResponse(status_code=422, content={"errores": error.errores})
@@ -88,7 +103,18 @@ def crear_compra(
         "total": compra.total,
         "estado": compra.estado,
         "mensaje": compra.mensaje,
+        "url_mercado_pago": url_checkout(compra.id) if compra.forma_pago == FORMA_PAGO_TARJETA else None,
     }
+
+
+@app.post("/api/usuarios", status_code=201)
+def registrar_usuario(datos: UsuarioRequest, repo: Repositorio = Depends(get_repositorio)):
+    errores = validar_registro(datos.email, datos.password)
+    if errores:
+        return JSONResponse(status_code=422, content={"errores": errores})
+    if not repo.registrar_usuario(datos.email, datos.password):
+        return JSONResponse(status_code=409, content={"errores": ["Ese mail ya está registrado"]})
+    return {"email": datos.email.strip().lower()}
 
 
 @app.get("/api/compras")
