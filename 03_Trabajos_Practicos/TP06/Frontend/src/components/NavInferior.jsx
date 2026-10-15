@@ -9,6 +9,12 @@ const ICONOS = {
       <path d="M12 7v5l3 2" />
     </>
   ),
+  panel: (
+    <>
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <path d="M8 20h8M12 16v4M7 12l3-3 2 2 4-4" />
+    </>
+  ),
 };
 
 export const SECCIONES = [
@@ -16,6 +22,17 @@ export const SECCIONES = [
   { id: 'mapa', etiqueta: 'Mapa' },
   { id: 'horarios', etiqueta: 'Alimentación' },
 ];
+
+// Panel del backend (tests y compras registradas), se abre en otra pestaña
+const URL_PANEL_BACKEND = 'http://localhost:8000';
+
+function Icono({ id }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {ICONOS[id]}
+    </svg>
+  );
+}
 
 export default function NavInferior({ seccionActual, onCambiar }) {
   return (
@@ -27,12 +44,14 @@ export default function NavInferior({ seccionActual, onCambiar }) {
           onClick={() => onCambiar(id)}
           aria-current={seccionActual === id ? 'page' : undefined}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            {ICONOS[id]}
-          </svg>
+          <Icono id={id} />
           <span>{etiqueta}</span>
         </button>
       ))}
+      <a className="nav-item" href={URL_PANEL_BACKEND} target="_blank" rel="noopener noreferrer">
+        <Icono id="panel" />
+        <span>Panel</span>
+      </a>
     </nav>
   );
 }
