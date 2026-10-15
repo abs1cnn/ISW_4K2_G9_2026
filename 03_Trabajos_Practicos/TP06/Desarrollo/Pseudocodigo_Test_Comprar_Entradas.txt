@@ -182,7 +182,7 @@ def test_comprar_entradas_pago_rechazado_por_mercado_pago_falla():
 
 
 ---------------------------------------------------------------------------
-5. ORDEN SUGERIDO PARA EL CICLO TDD (Red -> Green -> Refactor)
+5. ORDEN PARA EL CICLO TDD (Red -> Green -> Refactor)
 ---------------------------------------------------------------------------
  1. test_comprar_entradas (camino feliz mínimo, sin mocks aún)
  2. usuario no registrado
