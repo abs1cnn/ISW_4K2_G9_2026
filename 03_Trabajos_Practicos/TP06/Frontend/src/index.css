@@ -36,7 +36,9 @@ body { margin: 0; background: #f4faf4; }
 .nav-item {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
   background: transparent; color: #7a8a7b; font-size: 0.75rem; padding: 6px 4px;
+  text-decoration: none;
 }
+a.nav-item:hover { color: var(--verde); }
 .nav-item svg { width: 24px; height: 24px; }
 .nav-item.activo { color: var(--verde); font-weight: 600; }
 .encabezado h1 { font-size: 1.3rem; margin: 0; }

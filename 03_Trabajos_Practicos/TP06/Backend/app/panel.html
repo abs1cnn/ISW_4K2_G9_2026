@@ -41,6 +41,38 @@
     pre { background: #1e1e1e; color: #ddd; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; max-height: 400px; }
     .vacio { color: var(--gris); }
     details summary { cursor: pointer; color: var(--gris); margin-top: 10px; }
+    td { overflow-wrap: anywhere; }
+
+    .titulo-seccion { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .titulo-seccion h2 { margin: 0; }
+    .boton-chico { display: inline-flex; padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; }
+
+    /* Celulares: las tablas se muestran como tarjetas, una por fila */
+    @media (max-width: 640px) {
+      header { padding: 12px; }
+      header h1 { font-size: 1.1rem; }
+      header p { font-size: 0.82rem; }
+      main { padding: 16px 12px; gap: 14px; }
+      section { padding: 14px; border-radius: 10px; }
+      .botones { grid-template-columns: 1fr; }
+      button, a.boton { padding: 14px; font-size: 1rem; }
+
+      .tabla { overflow-x: visible; }
+      .tabla thead { display: none; }
+      .tabla table, .tabla tbody, .tabla tr, .tabla td { display: block; width: 100%; }
+      .tabla tr { border: 1px solid #e6eee6; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
+      .tabla td {
+        display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+        border: none; padding: 3px 0; text-align: right;
+      }
+      .tabla td::before {
+        content: attr(data-label); flex-shrink: 0; text-align: left;
+        color: var(--gris); font-weight: 600; font-size: 0.8rem;
+      }
+      .tabla td.vacio { justify-content: flex-start; text-align: left; }
+      .tabla td.vacio::before { content: none; }
+      pre { font-size: 0.72rem; }
+    }
   </style>
 </head>
 <body>
@@ -72,7 +104,10 @@
     </section>
 
     <section>
-      <h2>Compras registradas <button id="btn-refrescar" style="display:inline;padding:4px 10px;font-size:0.8rem;margin-left:8px">Actualizar</button></h2>
+      <div class="titulo-seccion">
+        <h2>Compras registradas</h2>
+        <button id="btn-refrescar" class="boton-chico">Actualizar</button>
+      </div>
       <div class="tabla">
         <table>
           <thead><tr><th>N°</th><th>Mail</th><th>Fecha visita</th><th>Cant.</th><th>Pase</th><th>Total</th><th>Estado</th><th>Creada</th></tr></thead>
@@ -100,10 +135,10 @@
               <thead><tr><th>Archivo</th><th>Test</th><th>Resultado</th><th>Tiempo</th></tr></thead>
               <tbody>${lista.map((t) => `
                 <tr>
-                  <td>${escapar(t.archivo)}</td>
-                  <td>${escapar(t.nombre)}</td>
-                  <td class="${t.resultado}">${t.resultado === 'PASSED' ? '✓ PASÓ' : t.resultado === 'FAILED' ? '✗ FALLÓ' : t.resultado}</td>
-                  <td>${(t.duracion * 1000).toFixed(1)} ms</td>
+                  <td data-label="Archivo">${escapar(t.archivo)}</td>
+                  <td data-label="Test">${escapar(t.nombre)}</td>
+                  <td data-label="Resultado" class="${t.resultado}">${t.resultado === 'PASSED' ? '✓ PASÓ' : t.resultado === 'FAILED' ? '✗ FALLÓ' : t.resultado}</td>
+                  <td data-label="Tiempo">${(t.duracion * 1000).toFixed(1)} ms</td>
                 </tr>`).join('')}
               </tbody>
             </table>
@@ -142,9 +177,14 @@
         ? '<tr><td colspan="8" class="vacio">Todavía no hay compras.</td></tr>'
         : compras.map((c) => `
           <tr>
-            <td>${c.id}</td><td>${escapar(c.email)}</td><td>${escapar(c.fecha_visita)}</td>
-            <td>${c.cantidad}</td><td>${escapar(c.tipo_pase)}</td><td>$${c.total}</td>
-            <td>${escapar(c.estado)}</td><td>${escapar(c.creada_en)}</td>
+            <td data-label="N°">${c.id}</td>
+            <td data-label="Mail">${escapar(c.email)}</td>
+            <td data-label="Fecha visita">${escapar(c.fecha_visita)}</td>
+            <td data-label="Cantidad">${c.cantidad}</td>
+            <td data-label="Pase">${escapar(c.tipo_pase)}</td>
+            <td data-label="Total">$${c.total}</td>
+            <td data-label="Estado">${escapar(c.estado)}</td>
+            <td data-label="Creada">${escapar(c.creada_en)}</td>
           </tr>`).join('');
     }
 

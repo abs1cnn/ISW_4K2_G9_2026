@@ -88,3 +88,207 @@ PRUEBAS DE USUARIO
 24. Probar comprar entradas con tarjeta y que Mercado Pago rechace el
     pago; no se registra la compra ni se envía el mail de confirmación
     (falla).
+
+===========================================================================
+ALCANCE IMPLEMENTADO EN EL TP (TDD)
+===========================================================================
+
+La User Story se implementó con un alcance reducido. Los criterios y las
+pruebas de usuario de arriba se mantienen tal como fueron definidos en el
+TP2; en esta sección se detalla qué se implementó, qué se adaptó y qué
+quedó fuera de alcance, junto con la justificación.
+
+---------------------------------------------------------------------------
+FUERA DE ALCANCE
+---------------------------------------------------------------------------
+1. Pago con tarjeta / redirección a Mercado Pago.
+   - Solo se admite pago en EFECTIVO (en boletería). La compra queda en
+     estado PENDIENTE_PAGO_BOLETERIA.
+   - Cualquier otra forma de pago (incluida "TARJETA") se rechaza con el
+     error "Forma de pago no admitida".
+   - Justificación: integrar una pasarela externa (credenciales, sandbox,
+     callbacks) excede el objetivo del TP, que es practicar el ciclo TDD
+     sobre las reglas de negocio de la compra. El diseño deja la puerta
+     abierta: las formas de pago están en la constante FORMAS_PAGO y los
+     servicios externos se inyectan, por lo que agregar la tarjeta sería
+     sumar "TARJETA" y una dependencia "cobrar" (mockeable en los tests).
+
+2. Usuarios registrados / inicio de sesión.
+   - No hay registro ni login. La compra se asocia a un mail, que es
+     obligatorio y debe tener un formato válido.
+   - Justificación: la gestión de usuarios es otra funcionalidad (otra
+     US) y no forma parte de "Comprar entradas". El mail cumple el rol de
+     identificar al comprador y es el destino de la confirmación.
+
+---------------------------------------------------------------------------
+SUPUESTOS DE NEGOCIO
+---------------------------------------------------------------------------
+- El parque abre de martes a domingo y cierra los lunes.
+- Precios: pase REGULAR $5000, pase VIP $10000. El total es
+  cantidad x precio del pase.
+- Edad válida de un visitante: número entero entre 0 y 120.
+- La fecha se recibe en formato ISO (AAAA-MM-DD).
+- El mail de confirmación es simulado: no se envía un mail real, se
+  registra en la tabla "mails_enviados" de la base SQLite.
+- El mensaje de confirmación informa la cantidad de entradas, la fecha
+  de visita, el total a pagar en boletería y el número de compra.
+
+---------------------------------------------------------------------------
+CRITERIOS DE ACEPTACIÓN: ESTADO
+---------------------------------------------------------------------------
+- Fecha, cantidad, edad de cada visitante y tipo de pase .... Implementado
+- Fecha del día actual o futura ............................ Implementado
+- Mensaje de confirmación vía mail ......................... Implementado (simulado)
+- Redirigir a Mercado Pago si paga con tarjeta ............. Fuera de alcance
+- Fecha dentro de los días en que el parque abre ........... Implementado
+- Seleccionar forma de pago (efectivo o tarjeta) ........... Adaptado (solo efectivo)
+- Cantidad de entradas no mayor a 10 ....................... Implementado
+- Informar cantidad de entradas y fecha al finalizar ....... Implementado
+- Compra solo para usuarios registrados .................... Adaptado (se pide mail)
+
+---------------------------------------------------------------------------
+PRUEBAS DE USUARIO: COBERTURA CON TESTS AUTOMATIZADOS
+---------------------------------------------------------------------------
+Tests en Backend/tests/unit/test_compra_service.py (además existen tests
+de integración de la API y tests del cliente en Frontend con Vitest).
+
+ 1. Compra con tarjeta + Mercado Pago ........ FUERA DE ALCANCE
+                                               (el camino feliz se cubre
+                                               en efectivo: test_comprar_entradas)
+ 2. Sin forma de pago ........................ test_comprar_entradas_sin_forma_de_pago_falla
+ 3. Parque cerrado ........................... test_comprar_entradas_parque_cerrado_falla
+ 4. Más de 10 entradas ....................... test_comprar_11_entradas_falla
+ 5. Compra en efectivo + mail ................ test_comprar_entradas,
+                                               test_comprar_entradas_envia_mail_con_cantidad_fecha_y_boleteria
+ 6. Fecha igual al día actual ................ test_comprar_entradas_para_el_dia_actual
+ 7. Exactamente 10 entradas .................. test_comprar_10_entradas_limite_superior
+ 8. Exactamente 1 entrada .................... test_comprar_1_entrada_limite_inferior
+ 9. Pase VIP ................................. test_comprar_entradas_con_tipo_de_pase_valido[VIP]
+10. Pase regular ............................. test_comprar_entradas_con_tipo_de_pase_valido[REGULAR]
+11. Informa cantidad y fecha ................. test_comprar_entradas_envia_mail_con_cantidad_fecha_y_boleteria
+12. Usuario no registrado .................... ADAPTADA: test_comprar_entradas_sin_mail_falla,
+                                               test_comprar_entradas_mail_invalido_falla
+13. Fecha pasada ............................. test_comprar_entradas_fecha_pasada_falla
+14. Sin fecha de visita ...................... test_comprar_entradas_sin_fecha_o_fecha_mal_formada_falla
+15. Cantidad 0 ............................... test_comprar_entradas_cantidad_invalida_o_negativa_falla[0]
+16. Cantidad negativa ........................ test_comprar_entradas_cantidad_invalida_o_negativa_falla[-1, -5]
+17. 11 entradas .............................. test_comprar_11_entradas_falla
+18. Falta la edad de algún visitante ......... test_comprar_entradas_edad_invalida_falla[30, None]
+19. Edades no coinciden con la cantidad ...... test_comprar_entradas_edades_no_coinciden_con_cantidad_falla
+20. Edad inválida (negativa / no numérica) ... test_comprar_entradas_edad_invalida_falla
+21. Sin tipo de pase ......................... test_comprar_entradas_tipo_pase_invalido_falla[None]
+22. Tipo de pase distinto de VIP o regular ... test_comprar_entradas_tipo_pase_invalido_falla[PREMIUM]
+23. Forma de pago no admitida ................ test_comprar_entradas_con_tarjeta_falla
+24. Mercado Pago rechaza el pago ............. FUERA DE ALCANCE
+
+Casos agregados durante el desarrollo (no estaban en la US original):
+- Mail obligatorio y con formato válido; se recortan espacios del mail.
+- Fecha mal formada (por ejemplo "10/10/2026" o texto libre).
+- Cantidad que no es un número entero (None, "3", 2.5).
+- Edad mayor a 120 y edad con decimales.
+- Cálculo del total (cantidad x precio del pase).
+- En todos los casos que fallan se verifica que no se guarde la compra
+  ni se envíe el mail.
+
+===========================================================================
+APLICACIÓN DEL CICLO TDD (RED - GREEN - REFACTOR)
+===========================================================================
+
+La funcionalidad se construyó a partir de las pruebas, siguiendo el ciclo:
+
+  RED      -> se escribe un test para un comportamiento nuevo y se ejecuta
+              para comprobar que falla (porque el código todavía no existe
+              o no contempla ese caso).
+  GREEN    -> se escribe el código mínimo necesario para que ese test (y
+              todos los anteriores) pasen.
+  REFACTOR -> con todos los tests en verde, se mejora el diseño (nombres,
+              duplicación, constantes, separación de responsabilidades)
+              volviendo a correr la suite para verificar que nada se rompió.
+
+Punto de partida: las pruebas de usuario de esta US y el pseudocódigo de
+tests (Desarrollo/Pseudocodigo_Test_Comprar_Entradas.txt), que definen el
+orden de las iteraciones.
+
+---------------------------------------------------------------------------
+ITERACIONES
+---------------------------------------------------------------------------
+
+Iteración 1 - Camino feliz mínimo
+  RED:      test_comprar_entradas: un pedido válido devuelve una compra con
+            la cantidad y la fecha indicadas. Falla porque no existe
+            comprar_entradas() ni la clase Pedido.
+  GREEN:    se crean Pedido, Compra y comprar_entradas() devolviendo la
+            compra armada con los datos del pedido.
+  REFACTOR: se crea pedido_valido(**cambios) en tests/conftest.py para que
+            cada test modifique solo el dato que quiere probar.
+
+Iteración 2 - Cantidad de entradas y valores límite
+  RED:      tests de 11 entradas (falla), 0 y negativos (falla) y de los
+            límites 1 y 10 (pasa).
+  GREEN:    se agregan las validaciones de cantidad (>= 1 y <= 10).
+  REFACTOR: el número 10 se reemplaza por la constante MAX_ENTRADAS; se
+            crea la excepción CompraInvalidaError para todos los rechazos y
+            el helper esperar_error() en los tests.
+
+Iteración 3 - Fecha de visita
+  RED:      tests de fecha pasada, sin fecha, fecha mal formada, parque
+            cerrado (lunes) y día actual.
+  GREEN:    se valida que la fecha exista, sea hoy o futura y que el parque
+            esté abierto.
+  REFACTOR: la fecha "de hoy" se inyecta como parámetro (hoy) para que los
+            tests no dependan del día en que se ejecutan; se extraen
+            parsear_fecha(), parque_abierto() y la constante DIAS_ABIERTO.
+
+Iteración 4 - Edades de los visitantes
+  RED:      tests de edades que no coinciden con la cantidad, edad faltante,
+            negativa, no numérica, con decimales y mayor a 120.
+  GREEN:    se valida la lista de edades.
+  REFACTOR: se extrae es_entero() (reutilizada por cantidad y edades) y la
+            constante EDAD_MAXIMA.
+
+Iteración 5 - Tipo de pase
+  RED:      tests con VIP y REGULAR (pasan) y con None / "PREMIUM" (fallan).
+  GREEN:    se valida el tipo de pase.
+  REFACTOR: constantes TIPO_PASE_VIP, TIPO_PASE_REGULAR y TIPOS_PASE.
+
+Iteración 6 - Forma de pago
+  RED:      tests sin forma de pago y con forma de pago no admitida
+            ("TARJETA", ver ALCANCE).
+  GREEN:    se valida que la forma de pago sea EFECTIVO.
+  REFACTOR: constantes FORMA_PAGO_EFECTIVO / FORMAS_PAGO y estado
+            ESTADO_PENDIENTE_PAGO.
+
+Iteración 7 - Mail del comprador (reemplaza al usuario registrado)
+  RED:      tests sin mail, con mail inválido y con espacios alrededor.
+  GREEN:    se valida el mail con una expresión regular y se recortan los
+            espacios.
+  REFACTOR: la expresión se extrae a la constante FORMATO_EMAIL.
+
+Iteración 8 - Registro de la compra, total y mail de confirmación
+  RED:      tests que verifican que se guarde la compra, se calcule el total
+            y se envíe un mail informando cantidad, fecha y boletería; y que
+            en los casos inválidos NO se guarde ni se envíe nada.
+  GREEN:    comprar_entradas() recibe las funciones guardar_compra y
+            enviar_mail; se agrega calcular_total() con la tabla PRECIOS.
+  REFACTOR: todas las validaciones se mueven a validar_pedido(), que junta
+            todos los errores en una lista (así se informan todos juntos);
+            en los tests se usa un RepositorioFalso en memoria como doble
+            de prueba.
+
+Iteración 9 - Integración con la API
+  RED:      tests de integración (tests/integration/test_api.py) contra el
+            endpoint con una base SQLite temporal.
+  GREEN:    se implementa el endpoint en FastAPI que arma el Pedido y llama
+            a comprar_entradas() con las funciones reales de la base.
+  REFACTOR: la lógica de negocio queda en compra_service.py sin depender de
+            FastAPI ni de la base; los datos de prueba se comparten en
+            tests/conftest.py entre unitarios e integración.
+
+El mismo enfoque se aplicó en el Frontend (compraService.test.js con
+Vitest) para las validaciones del lado del cliente.
+
+---------------------------------------------------------------------------
+RESULTADO
+---------------------------------------------------------------------------
+- Backend: 45 tests (unitarios + integración) en verde (pytest).
+- Frontend: 30 tests en verde (Vitest).
