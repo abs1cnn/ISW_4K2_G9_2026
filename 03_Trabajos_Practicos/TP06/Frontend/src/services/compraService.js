@@ -22,6 +22,14 @@ export const DIAS_ABIERTO = [0, 2, 3, 4, 5, 6];
 // Días festivos en los que el parque permanece cerrado (formato MM-DD)
 export const FESTIVOS = ['12-25', '01-01'];
 
+// Horizonte máximo de compra anticipada (en meses calendario)
+export const HORIZONTE_COMPRA_MESES = 1;
+
+/** Retorna la fecha máxima seleccionable: hoy + HORIZONTE_COMPRA_MESES meses. */
+export function fechaMaximaCompra(hoy = new Date()) {
+  return new Date(hoy.getFullYear(), hoy.getMonth() + HORIZONTE_COMPRA_MESES, hoy.getDate());
+}
+
 const FORMATO_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Convierte 'YYYY-MM-DD' a Date local (evita corrimientos por zona horaria)
@@ -72,6 +80,8 @@ export function validarPedido(pedido, hoy = new Date()) {
     errores.push('Debe indicar la fecha de visita');
   } else if (fechaVisita < inicioDelDia(hoy)) {
     errores.push('La fecha de visita debe ser hoy o una fecha futura');
+  } else if (fechaVisita > fechaMaximaCompra(hoy)) {
+    errores.push(`Solo se pueden comprar entradas con hasta ${HORIZONTE_COMPRA_MESES} mes de anticipación`);
   } else if (!parqueAbierto(fechaVisita)) {
     errores.push('El parque está cerrado ese día (cierra los lunes y días festivos: 25/12 y 1/1)');
   }

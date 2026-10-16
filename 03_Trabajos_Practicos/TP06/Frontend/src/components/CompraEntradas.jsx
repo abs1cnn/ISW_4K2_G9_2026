@@ -6,6 +6,7 @@ import {
   PRECIOS,
   FORMAS_PAGO,
   FESTIVOS,
+  fechaMaximaCompra,
   calcularTotal,
   validarPedido,
   parqueAbierto,
@@ -20,6 +21,13 @@ function hoyComoTexto() {
   const mes = String(hoy.getMonth() + 1).padStart(2, '0');
   const dia = String(hoy.getDate()).padStart(2, '0');
   return `${hoy.getFullYear()}-${mes}-${dia}`;
+}
+
+function maxFechaComoTexto() {
+  const max = fechaMaximaCompra();
+  const mes = String(max.getMonth() + 1).padStart(2, '0');
+  const dia = String(max.getDate()).padStart(2, '0');
+  return `${max.getFullYear()}-${mes}-${dia}`;
 }
 
 /** Devuelve true si la fecha (objeto Date) corresponde a un día en que el parque está cerrado */
@@ -49,9 +57,11 @@ export default function CompraEntradas({ onCompra }) {
   const [edades, setEdades] = useState(['']);
   const [tipoPase, setTipoPase] = useState(TIPOS_PASE.REGULAR);
   const [formaPago, setFormaPago] = useState('');
-  const [errores, setErrores] = useState([]);
+  const [tocado, setTocado] = useState(false);       // true tras el primer cambio en cualquier campo
+  const [erroresBackend, setErroresBackend] = useState([]); // solo errores que vienen del servidor
 
   function cambiarFecha(valor) {
+    setTocado(true);
     setFecha(valor);
     const fechaObj = parsearFecha(valor);
     if (fechaObj && esFechaDeshabilitada(fechaObj)) {
@@ -62,6 +72,7 @@ export default function CompraEntradas({ onCompra }) {
   }
 
   function cambiarCantidad(valor) {
+    setTocado(true);
     // No se permiten negativos ni cero: se fuerza el rango 1..MAX_ENTRADAS
     const numero = Math.min(Math.max(parseInt(valor, 10) || 1, 1), MAX_ENTRADAS);
     setCantidad(numero);
@@ -69,6 +80,7 @@ export default function CompraEntradas({ onCompra }) {
   }
 
   function cambiarEdad(indice, valor) {
+    setTocado(true);
     setEdades((anteriores) => anteriores.map((edad, i) => (i === indice ? valor : edad)));
   }
 
@@ -86,13 +98,6 @@ export default function CompraEntradas({ onCompra }) {
       tipoPase,
       formaPago,
     };
-
-    // Validamos primero localmente con las reglas de negocio
-    const erroresLocales = validarPedido(pedido);
-    if (erroresLocales.length > 0) {
-      setErrores(erroresLocales);
-      return;
-    }
 
     // Intentamos persistir en el backend si está activo
     try {
@@ -120,13 +125,13 @@ export default function CompraEntradas({ onCompra }) {
           formaPago: datos.forma_pago,
           total: datos.total,
         });
-        setErrores([]);
+        setErroresBackend([]);
         return;
       }
 
       if (respuesta.status === 422) {
         const errorData = await respuesta.json();
-        setErrores(errorData.errores || ['Error al procesar la compra']);
+        setErroresBackend(errorData.errores || ['Error al procesar la compra']);
         return;
       }
     } catch {
@@ -135,12 +140,28 @@ export default function CompraEntradas({ onCompra }) {
 
     try {
       onCompra(comprarEntradas(pedido, { enviarMail }));
-      setErrores([]);
+      setErroresBackend([]);
     } catch (err) {
-      if (err instanceof CompraInvalidaError) setErrores(err.errores);
+      if (err instanceof CompraInvalidaError) setErroresBackend(err.errores);
       else throw err;
     }
   }
+
+  // Derivado: el formulario es válido cuando validarPedido no encuentra errores
+  // con los valores actuales. Se recalcula en cada render sin estado extra.
+  // Derivados: calculados en cada render a partir del estado actual
+  const pedidoActual = {
+    email,
+    fecha,
+    cantidad,
+    edades: edades.map((e) => (e === '' ? NaN : Number(e))),
+    tipoPase,
+    formaPago,
+  };
+  const erroresLocales = validarPedido(pedidoActual);
+  const formularioValido = erroresLocales.length === 0;
+  // Mostramos errores locales solo después de que el usuario haya tocado el formulario
+  const erroresVisibles = tocado ? erroresLocales : erroresBackend;
 
   return (
     <form className="tarjeta" onSubmit={handleSubmit} noValidate>
@@ -152,7 +173,7 @@ export default function CompraEntradas({ onCompra }) {
           type="email"
           placeholder="tu@mail.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setTocado(true); setEmail(e.target.value); }}
           autoFocus
         />
         <small>Te enviaremos la confirmación de la compra a este mail.</small>
@@ -163,6 +184,7 @@ export default function CompraEntradas({ onCompra }) {
         <input
           type="date"
           min={hoyComoTexto()}
+          max={maxFechaComoTexto()}
           value={fecha}
           className={fechaInvalida ? 'fecha-invalida' : ''}
           onChange={(e) => cambiarFecha(e.target.value)}
@@ -170,7 +192,10 @@ export default function CompraEntradas({ onCompra }) {
         {fechaInvalida ? (
           <span className="aviso-fecha-cerrada">⚠ {fechaInvalida}</span>
         ) : (
-          <small>El parque abre de martes a domingo, excepto el 25/12 y el 1/1.</small>
+          <small>
+            El parque abre de martes a domingo, excepto el 25/12 y el 1/1.
+            Solo podés comprar entradas con hasta 1 mes de anticipación.
+          </small>
         )}
       </label>
 
@@ -237,15 +262,15 @@ export default function CompraEntradas({ onCompra }) {
 
       <p className="total">Total: ${calcularTotal(cantidad, tipoPase).toLocaleString('es-AR')}</p>
 
-      {errores.length > 0 && (
+      {erroresVisibles.length > 0 && (
         <ul className="error">
-          {errores.map((error) => (
+          {erroresVisibles.map((error) => (
             <li key={error}>{error}</li>
           ))}
         </ul>
       )}
 
-      <button type="submit">Confirmar compra</button>
+      <button type="submit" disabled={!formularioValido}>Confirmar compra</button>
     </form>
   );
 }

@@ -94,6 +94,7 @@ button {
   transition: background 0.2s;
 }
 button:hover { background: var(--secundario); }
+button:disabled { opacity: 0.45; cursor: not-allowed; background: var(--primario); }
 .boton-secundario { background: transparent; border: 1px solid white; padding: 6px 10px; font-size: 0.85rem; }
 
 .total { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--primario); }
