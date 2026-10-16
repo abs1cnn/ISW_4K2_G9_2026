@@ -5,8 +5,11 @@ import {
   TIPOS_PASE,
   PRECIOS,
   FORMAS_PAGO,
+  FESTIVOS,
   calcularTotal,
   validarPedido,
+  parqueAbierto,
+  parsearFecha,
   comprarEntradas,
   CompraInvalidaError,
 } from '../services/compraService';
@@ -19,14 +22,44 @@ function hoyComoTexto() {
   return `${hoy.getFullYear()}-${mes}-${dia}`;
 }
 
+/** Devuelve true si la fecha (objeto Date) corresponde a un día en que el parque está cerrado */
+function esFechaDeshabilitada(fecha) {
+  return !parqueAbierto(fecha);
+}
+
+/** Genera el aviso que se muestra bajo el campo de fecha cuando el día está cerrado */
+function motivoCierre(fecha) {
+  if (!fecha) return null;
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  if (FESTIVOS.includes(`${mes}-${dia}`)) {
+    return `El parque está cerrado ese día festivo (${dia}/${mes}).`;
+  }
+  if (fecha.getDay() === 1) {
+    return 'El parque está cerrado los lunes.';
+  }
+  return null;
+}
+
 export default function CompraEntradas({ onCompra }) {
   const [email, setEmail] = useState('');
   const [fecha, setFecha] = useState('');
+  const [fechaInvalida, setFechaInvalida] = useState(null); // motivo de cierre o null
   const [cantidad, setCantidad] = useState(1);
   const [edades, setEdades] = useState(['']);
   const [tipoPase, setTipoPase] = useState(TIPOS_PASE.REGULAR);
   const [formaPago, setFormaPago] = useState('');
   const [errores, setErrores] = useState([]);
+
+  function cambiarFecha(valor) {
+    setFecha(valor);
+    const fechaObj = parsearFecha(valor);
+    if (fechaObj && esFechaDeshabilitada(fechaObj)) {
+      setFechaInvalida(motivoCierre(fechaObj));
+    } else {
+      setFechaInvalida(null);
+    }
+  }
 
   function cambiarCantidad(valor) {
     // No se permiten negativos ni cero: se fuerza el rango 1..MAX_ENTRADAS
@@ -127,8 +160,18 @@ export default function CompraEntradas({ onCompra }) {
 
       <label>
         Fecha de visita
-        <input type="date" min={hoyComoTexto()} value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        <small>El parque abre de martes a domingo.</small>
+        <input
+          type="date"
+          min={hoyComoTexto()}
+          value={fecha}
+          className={fechaInvalida ? 'fecha-invalida' : ''}
+          onChange={(e) => cambiarFecha(e.target.value)}
+        />
+        {fechaInvalida ? (
+          <span className="aviso-fecha-cerrada">⚠ {fechaInvalida}</span>
+        ) : (
+          <small>El parque abre de martes a domingo, excepto el 25/12 y el 1/1.</small>
+        )}
       </label>
 
       <label>
@@ -173,7 +216,7 @@ export default function CompraEntradas({ onCompra }) {
               checked={tipoPase === tipo}
               onChange={() => setTipoPase(tipo)}
             />
-            {tipo === TIPOS_PASE.VIP ? 'VIP' : 'Regular'} (${PRECIOS[tipo]} c/u)
+            {tipo === TIPOS_PASE.VIP ? 'VIP' : 'Regular'} (${PRECIOS[tipo].toLocaleString('es-AR')} c/u)
           </label>
         ))}
       </fieldset>
@@ -192,7 +235,7 @@ export default function CompraEntradas({ onCompra }) {
         </label>
       </fieldset>
 
-      <p className="total">Total: ${calcularTotal(cantidad, tipoPase)}</p>
+      <p className="total">Total: ${calcularTotal(cantidad, tipoPase).toLocaleString('es-AR')}</p>
 
       {errores.length > 0 && (
         <ul className="error">

@@ -17,7 +17,7 @@ export default function Confirmacion({ compra, onNuevaCompra }) {
         <strong>{formatearFecha(compra.fecha)}</strong>.
       </p>
       <p>
-        Total a pagar en boletería: <strong>${compra.total}</strong>
+        Total a pagar en boletería: <strong>${compra.total.toLocaleString('es-AR')}</strong>
       </p>
       <p className="ayuda">Te enviamos un mail de confirmación a {compra.email}.</p>
       <button onClick={onNuevaCompra}>Nueva compra</button>

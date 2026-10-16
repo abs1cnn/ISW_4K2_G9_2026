@@ -1,16 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap');
+
+/* ── Paleta: https://coolors.co/palette/386641-6a994e-a7c957-f2e8cf-bc4749 ── */
 :root {
-  --verde: #2e7d32;
-  --verde-claro: #e8f5e9;
-  --texto: #1b1b1b;
-  --borde: #c8d6c9;
-  --error: #c62828;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --verde-oscuro:  #386641;
+  --verde-medio:   #6A994E;
+  --verde-claro:   #A7C957;
+  --crema:         #F2E8CF;
+  --rojo:          #BC4749;
+
+  /* Aliases semánticos */
+  --primario:   var(--verde-oscuro);
+  --secundario: var(--verde-medio);
+  --acento:     var(--verde-claro);
+  --fondo:      var(--crema);
+  --error:      var(--rojo);
+  --texto:      #1b1b1b;
+  --borde:      #c5d5a8;
+
+  font-family: 'Lato', system-ui, -apple-system, sans-serif;
   color: var(--texto);
 }
 
 * { box-sizing: border-box; }
 
-body { margin: 0; background: #f4faf4; }
+body { margin: 0; background: var(--fondo); }
 
 .app { position: relative; min-height: 100vh; }
 .app { padding-bottom: 76px; }
@@ -23,7 +36,7 @@ body { margin: 0; background: #f4faf4; }
 
 .encabezado {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 16px; background: var(--verde); color: white;
+  padding: 12px 16px; background: var(--primario); color: white;
 }
 
 .nav-inferior {
@@ -38,9 +51,9 @@ body { margin: 0; background: #f4faf4; }
   background: transparent; color: #7a8a7b; font-size: 0.75rem; padding: 6px 4px;
   text-decoration: none;
 }
-a.nav-item:hover { color: var(--verde); }
+a.nav-item:hover { color: var(--primario); }
 .nav-item svg { width: 24px; height: 24px; }
-.nav-item.activo { color: var(--verde); font-weight: 600; }
+.nav-item.activo { color: var(--primario); font-weight: 700; }
 .encabezado h1 { font-size: 1.3rem; margin: 0; }
 .sesion { display: flex; gap: 12px; align-items: center; font-size: 0.9rem; }
 
@@ -51,27 +64,45 @@ a.nav-item:hover { color: var(--verde); }
   padding: 24px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   display: flex; flex-direction: column; gap: 14px;
 }
-.tarjeta h2 { margin: 0 0 4px; color: var(--verde); }
+.tarjeta h2 { margin: 0 0 4px; color: var(--primario); }
 
 label { display: flex; flex-direction: column; gap: 4px; font-size: 0.95rem; }
 label.opcion { flex-direction: row; align-items: center; gap: 8px; }
 small, .ayuda { color: #666; font-size: 0.85rem; }
 
 input:not([type='radio']) {
-  padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: 1rem;
+  padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px;
+  font-size: 1rem; font-family: inherit;
+}
+input:focus:not([type='radio']) {
+  outline: 2px solid var(--secundario); border-color: var(--secundario);
+}
+
+/* Fecha deshabilitada — feedback visual */
+input[type='date'].fecha-invalida {
+  border-color: var(--error);
+  background: #fdf0f0;
 }
 
 fieldset { border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px; }
-legend { padding: 0 4px; font-weight: 600; }
+legend { padding: 0 4px; font-weight: 700; }
 .edades { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
 
 button {
-  padding: 10px 14px; border: none; border-radius: 6px; background: var(--verde);
-  color: white; font-size: 1rem; cursor: pointer;
+  padding: 10px 14px; border: none; border-radius: 6px; background: var(--primario);
+  color: white; font-size: 1rem; font-family: inherit; font-weight: 700; cursor: pointer;
+  transition: background 0.2s;
 }
-button:hover { opacity: 0.9; }
+button:hover { background: var(--secundario); }
 .boton-secundario { background: transparent; border: 1px solid white; padding: 6px 10px; font-size: 0.85rem; }
 
-.total { font-size: 1.1rem; font-weight: 600; margin: 0; }
+.total { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--primario); }
 .error { color: var(--error); margin: 0; font-size: 0.9rem; }
 ul.error { padding-left: 18px; }
+
+/* Badge de aviso de día cerrado bajo el calendario */
+.aviso-fecha-cerrada {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.85rem; color: var(--error); font-weight: 600;
+  margin-top: 2px;
+}

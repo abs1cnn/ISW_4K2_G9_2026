@@ -7,8 +7,8 @@ export const TIPOS_PASE = {
 };
 
 export const PRECIOS = {
-  [TIPOS_PASE.REGULAR]: 5000,
-  [TIPOS_PASE.VIP]: 10000,
+  [TIPOS_PASE.REGULAR]: 10000,
+  [TIPOS_PASE.VIP]: 20000,
 };
 
 // Por ahora solo se admite pago en efectivo (en boletería)
@@ -16,8 +16,11 @@ export const FORMAS_PAGO = {
   EFECTIVO: 'EFECTIVO',
 };
 
-// 0 = domingo ... 6 = sábado. El parque cierra los lunes.
+// 0 = domingo ... 6 = sábado. El parque cierra los lunes (día 1).
 export const DIAS_ABIERTO = [0, 2, 3, 4, 5, 6];
+
+// Días festivos en los que el parque permanece cerrado (formato MM-DD)
+export const FESTIVOS = ['12-25', '01-01'];
 
 const FORMATO_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,8 +41,14 @@ function inicioDelDia(fecha) {
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
 }
 
+function esFestivo(fecha) {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return FESTIVOS.includes(`${mes}-${dia}`);
+}
+
 export function parqueAbierto(fecha) {
-  return DIAS_ABIERTO.includes(fecha.getDay());
+  return DIAS_ABIERTO.includes(fecha.getDay()) && !esFestivo(fecha);
 }
 
 export function calcularTotal(cantidad, tipoPase) {
@@ -64,7 +73,7 @@ export function validarPedido(pedido, hoy = new Date()) {
   } else if (fechaVisita < inicioDelDia(hoy)) {
     errores.push('La fecha de visita debe ser hoy o una fecha futura');
   } else if (!parqueAbierto(fechaVisita)) {
-    errores.push('El parque está cerrado ese día (cierra los lunes)');
+    errores.push('El parque está cerrado ese día (cierra los lunes y días festivos: 25/12 y 1/1)');
   }
 
   if (!Number.isInteger(cantidad) || cantidad < 1) {
