@@ -22,7 +22,7 @@ function hoyComoTexto() {
 }
 
 export default function CompraEntradas({ onCompra }) {
-  const email = 'visitante@ecoharmony.com';
+  const email = 'franciscobegliardo@gmail.com';
   const [fecha, setFecha] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [edades, setEdades] = useState(['']);

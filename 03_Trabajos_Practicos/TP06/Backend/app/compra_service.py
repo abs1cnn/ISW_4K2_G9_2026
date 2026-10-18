@@ -159,3 +159,4 @@ def comprar_entradas(
     )
     enviar_mail(compra.email, compra.mensaje)
     return compra
+

@@ -7,6 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
+from app.mail_service import get_mail_service, MailService
+
+
 from app.compra_service import (
     DIAS_ABIERTO,
     EDAD_MAXIMA,
@@ -71,15 +74,17 @@ def configuracion():
 def crear_compra(
     datos: PedidoRequest,
     repo: Repositorio = Depends(get_repositorio),
+    notificador: MailService = Depends(get_mail_service),
     hoy: date = Depends(get_hoy),
 ):
     try:
         datos.email = sesion()["email"]  # Sesión mock autorizada por el PO.
+    
         compra = comprar_entradas(
             Pedido(**datos.model_dump()),
             hoy=hoy,
             guardar_compra=repo.guardar_compra,
-            enviar_mail=repo.guardar_mail,
+            enviar_mail=notificador.enviar_mail,
         )
     except CompraInvalidaError as error:
         return JSONResponse(status_code=422, content={"errores": error.errores})
