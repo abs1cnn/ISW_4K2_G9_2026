@@ -34,6 +34,7 @@ Grupo 9
 | **Consignas**                    | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Consigna/`         | `.pdf`, `.docx`                                    |
 | **Backend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Backend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.py`              |
 | **Frontend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Frontend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.html`, `.css`             |
+| **User Stories de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/UserStories/`       | `.pdf`, `.docx`, `.xlsx`, `.txt`            |
 | **Desarrollo de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Desarrollo/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
 | **Primer parcial - anteriores**  | `[año]_[tema].[extensión]`              | `04_Parciales/Primer_Parcial/Parciales_Anteriores/`  | `.pdf`                                               |
 | **Primer parcial - ejercicios**  | `Ej_[tema].[extensión]`                  | `04_Parciales/Primer_Parcial/Ejercicios/`            | `.pdf`, `.docx`                                    |
