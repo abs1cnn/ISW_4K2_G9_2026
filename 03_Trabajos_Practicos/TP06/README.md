@@ -39,6 +39,13 @@ npm test        # corre los tests de validación del cliente
 ## Supuestos
 
 - Pago solo en efectivo (en boletería); la compra queda en estado `PENDIENTE_PAGO_BOLETERIA`.
-- No hay login: la compra se asocia a un mail.
-- El parque cierra los lunes. Precios: Regular $5000, VIP $10000. Edad válida: 0 a 120.
+- Sesión simulada del usuario `visitante@ecoharmony.com`, autorizada por el PO. El servidor determina el comprador; cambiar el mail del pedido no permite evadir el límite.
+- El parque abre de 8:30 a 19, excepto lunes, 25 de diciembre y 1 de enero. El formulario rechaza seleccionar días cerrados.
+- Precios: Regular $10.000, VIP $20.000. Hasta 3 años inclusive: gratis; de 4 a 15 y desde 60: 50% de descuento. Edad válida: 0 a 120.
+- Anticipación máxima de un mes calendario, ajustando al último día del mes siguiente si corresponde. Compra para el día actual hasta las 17:30 inclusive (hora argentina).
+- Máximo de 10 entradas por usuario y fecha de visita, acumuladas entre transacciones, incluidas las gratuitas. SQLite verifica el límite dentro de una transacción de escritura. No hay cupo global diario.
 - El mail de confirmación es simulado: se guarda en la tabla `mails_enviados`.
+- Paleta del PO y fuente Lato; la fuente se carga desde Google Fonts y necesita conexión.
+- El servidor debe estar disponible para confirmar una compra. No se simula una compra exitosa ante errores de red.
+
+Las aclaraciones de `Consigna/requerimientos_PO.pdf` se aplican a compra de entradas. Cupos, turnos, vestimenta, DNI y QR de actividades corresponden a otra historia. Se mantiene pago exclusivamente en efectivo por el alcance acordado. El logo requiere diseño y validación del PO; no se considera aprobado.

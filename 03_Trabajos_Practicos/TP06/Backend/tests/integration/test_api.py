@@ -19,7 +19,7 @@ def test_api_comprar_entradas_registra_compra_y_mail(cliente, repo_sqlite):
     cuerpo = respuesta.json()
     assert cuerpo["cantidad"] == 2
     assert cuerpo["fecha"] == FECHA_ABIERTO
-    assert cuerpo["total"] == 10000
+    assert cuerpo["total"] == 15000
     assert cuerpo["estado"] == "PENDIENTE_PAGO_BOLETERIA"
 
     assert len(repo_sqlite.listar_compras()) == 1
@@ -50,3 +50,20 @@ def test_api_configuracion(cliente):
     configuracion = cliente.get("/api/configuracion").json()
     assert configuracion["max_entradas"] == 10
     assert configuracion["formas_pago"] == ["EFECTIVO"]
+
+
+def test_limite_acumulado_por_usuario_y_fecha(cliente, repo_sqlite):
+    pedido = {**PEDIDO, "cantidad": 5, "edades": [3] * 5}
+    assert cliente.post("/api/compras", json=pedido).status_code == 201
+    assert cliente.post("/api/compras", json=pedido).status_code == 201
+    respuesta = cliente.post("/api/compras", json={**PEDIDO, "email": "otro@mail.com"})
+    assert respuesta.status_code == 422
+    assert len(repo_sqlite.listar_compras()) == 2
+    assert len(repo_sqlite.listar_mails()) == 2
+    assert cliente.post("/api/compras", json={**PEDIDO, "fecha": "2026-10-11"}).status_code == 201
+
+
+def test_sesion_mock_no_admite_suplantacion_por_mail(cliente):
+    sesion = cliente.get("/api/sesion").json()
+    respuesta = cliente.post("/api/compras", json={**PEDIDO, "email": "otro@mail.com"})
+    assert respuesta.json()["email"] == sesion["email"]

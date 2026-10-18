@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
@@ -42,13 +42,18 @@ class PedidoRequest(BaseModel):
     forma_pago: Optional[str] = None
 
 
-def get_hoy() -> date:
-    return date.today()
+def get_hoy() -> datetime:
+    return datetime.now(timezone(timedelta(hours=-3)))
 
 
 @app.get("/", include_in_schema=False)
 def panel():
     return FileResponse(PANEL_HTML)
+
+
+@app.get("/api/sesion")
+def sesion():
+    return {"email": "visitante@ecoharmony.com", "nombre": "Visitante", "simulada": True}
 
 
 @app.get("/api/configuracion")
@@ -69,6 +74,7 @@ def crear_compra(
     hoy: date = Depends(get_hoy),
 ):
     try:
+        datos.email = sesion()["email"]  # Sesión mock autorizada por el PO.
         compra = comprar_entradas(
             Pedido(**datos.model_dump()),
             hoy=hoy,
