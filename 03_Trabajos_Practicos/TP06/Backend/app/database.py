@@ -4,7 +4,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-from app.compra_service import Compra
+from app.compra_service import Compra, CompraInvalidaError, MAX_ENTRADAS
 
 DB_PATH_DEFAULT = Path(__file__).resolve().parent.parent / "ecoharmony.db"
 
@@ -49,6 +49,13 @@ class Repositorio:
 
     def guardar_compra(self, compra: Compra) -> int:
         with self._conectar() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            acumuladas = conn.execute(
+                "SELECT COALESCE(SUM(cantidad), 0) FROM compras WHERE lower(trim(email)) = ? AND fecha_visita = ?",
+                (compra.email.strip().lower(), compra.fecha.isoformat()),
+            ).fetchone()[0]
+            if acumuladas + compra.cantidad > MAX_ENTRADAS:
+                raise CompraInvalidaError(["No se pueden comprar más de 10 entradas por usuario y fecha, incluyendo compras anteriores"])
             cursor = conn.execute(
                 "INSERT INTO compras (email, fecha_visita, cantidad, tipo_pase, forma_pago, total, estado) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",

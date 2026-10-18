@@ -1,32 +1,35 @@
 import { useState } from 'react';
+import ResumenCompra from './ResumenCompra';
 import {
   MAX_ENTRADAS,
   EDAD_MAXIMA,
   TIPOS_PASE,
   PRECIOS,
   FORMAS_PAGO,
-  calcularTotal,
   validarPedido,
-  comprarEntradas,
-  CompraInvalidaError,
+  parqueAbierto,
+  parsearFecha,
+  limiteCompra,
+  ahoraParque,
 } from '../services/compraService';
-import { enviarMail } from '../services/mailService';
+
 
 function hoyComoTexto() {
-  const hoy = new Date();
+  const hoy = ahoraParque();
   const mes = String(hoy.getMonth() + 1).padStart(2, '0');
   const dia = String(hoy.getDate()).padStart(2, '0');
   return `${hoy.getFullYear()}-${mes}-${dia}`;
 }
 
 export default function CompraEntradas({ onCompra }) {
-  const [email, setEmail] = useState('');
+  const email = 'visitante@ecoharmony.com';
   const [fecha, setFecha] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [edades, setEdades] = useState(['']);
   const [tipoPase, setTipoPase] = useState(TIPOS_PASE.REGULAR);
   const [formaPago, setFormaPago] = useState('');
   const [errores, setErrores] = useState([]);
+  const [enviando, setEnviando] = useState(false);
 
   function cambiarCantidad(valor) {
     // No se permiten negativos ni cero: se fuerza el rango 1..MAX_ENTRADAS
@@ -45,6 +48,7 @@ export default function CompraEntradas({ onCompra }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (enviando) return;
     const pedido = {
       email,
       fecha,
@@ -61,7 +65,8 @@ export default function CompraEntradas({ onCompra }) {
       return;
     }
 
-    // Intentamos persistir en el backend si está activo
+    setEnviando(true);
+    // La confirmación requiere que el servidor registre la compra.
     try {
       const respuesta = await fetch('/api/compras', {
         method: 'POST',
@@ -86,6 +91,7 @@ export default function CompraEntradas({ onCompra }) {
           tipoPase: datos.tipo_pase,
           formaPago: datos.forma_pago,
           total: datos.total,
+          edades: pedido.edades,
         });
         setErrores([]);
         return;
@@ -96,16 +102,11 @@ export default function CompraEntradas({ onCompra }) {
         setErrores(errorData.errores || ['Error al procesar la compra']);
         return;
       }
+      setErrores(['No se pudo registrar la compra. Intentá nuevamente.']);
     } catch {
-      // Backend no disponible: fallback al servicio local
-    }
-
-    try {
-      onCompra(comprarEntradas(pedido, { enviarMail }));
-      setErrores([]);
-    } catch (err) {
-      if (err instanceof CompraInvalidaError) setErrores(err.errores);
-      else throw err;
+      setErrores(['No se pudo conectar con el servidor. Verificá tus compras antes de reintentar.']);
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -119,20 +120,26 @@ export default function CompraEntradas({ onCompra }) {
           type="email"
           placeholder="tu@mail.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          readOnly
           autoFocus
         />
-        <small>Te enviaremos la confirmación de la compra a este mail.</small>
+        <small>Sesión simulada: la compra se asocia a este usuario.</small>
       </label>
 
       <label>
         Fecha de visita
-        <input type="date" min={hoyComoTexto()} value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        <small>El parque abre de martes a domingo.</small>
+        <input type="date" min={hoyComoTexto()} max={(() => { const f = limiteCompra(); return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`; })()} value={fecha} onChange={(e) => {
+          const valor = e.target.value;
+          if (valor && (!parsearFecha(valor) || !parqueAbierto(parsearFecha(valor)))) {
+            setFecha('');
+            setErrores(['El parque está cerrado ese día o la fecha no es válida. Elegí otra fecha.']);
+          } else { setFecha(valor); setErrores([]); }
+        }} />
+        <small>Abierto de 8:30 a 19, excepto lunes, 25/12 y 1/1. Anticipación máxima: un mes. Para hoy, comprá hasta las 17:30.</small>
       </label>
 
       <label>
-        Cantidad de entradas (máx. {MAX_ENTRADAS})
+        Cantidad de entradas (máx. {MAX_ENTRADAS} por usuario y fecha)
         <input
           type="number"
           min={1}
@@ -145,6 +152,7 @@ export default function CompraEntradas({ onCompra }) {
 
       <fieldset>
         <legend>Edad de cada visitante</legend>
+        <small>Hasta 3 años: gratis. De 4 a 15 y desde 60 años: 50% de descuento.</small>
         <div className="edades">
           {edades.map((edad, i) => (
             <label key={i}>
@@ -192,7 +200,7 @@ export default function CompraEntradas({ onCompra }) {
         </label>
       </fieldset>
 
-      <p className="total">Total: ${calcularTotal(cantidad, tipoPase)}</p>
+      <ResumenCompra edades={edades} tipoPase={tipoPase} />
 
       {errores.length > 0 && (
         <ul className="error">
@@ -202,7 +210,7 @@ export default function CompraEntradas({ onCompra }) {
         </ul>
       )}
 
-      <button type="submit">Confirmar compra</button>
+      <button type="submit" disabled={enviando}>{enviando ? "Registrando…" : "Confirmar compra"}</button>
     </form>
   );
 }

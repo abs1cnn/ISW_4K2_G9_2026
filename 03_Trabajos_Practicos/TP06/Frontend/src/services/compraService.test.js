@@ -45,7 +45,7 @@ describe('comprarEntradas - casos que pasan', () => {
 
     expect(resultado.cantidad).toBe(3);
     expect(resultado.fecha).toBe(FECHA_ABIERTO);
-    expect(resultado.total).toBe(3 * PRECIOS.VIP);
+    expect(resultado.total).toBe(2.5 * PRECIOS.VIP);
     expect(enviarMail).toHaveBeenCalledTimes(1);
     expect(enviarMail).toHaveBeenCalledWith('visitante@ecoharmony.com', expect.stringContaining('3 entradas'));
   });
@@ -127,5 +127,41 @@ describe('calcularTotal', () => {
 
   it('devuelve 0 para cantidades negativas', () => {
     expect(calcularTotal(-3, 'VIP')).toBe(0);
+  });
+});
+
+
+describe('Reglas PO', () => {
+  it.each(['REGULAR', 'VIP'])('compra para mayor de 60 con descuento del 50%% en %s', tipoPase => {
+    const enviarMail = vi.fn();
+    const resultado = comprar(pedidoValido({ cantidad: 1, edades: [61], tipoPase }), enviarMail);
+    expect(resultado.total).toBe(PRECIOS[tipoPase] / 2);
+    expect(enviarMail).toHaveBeenCalledWith(resultado.email, expect.stringContaining(`$${resultado.total}`));
+  });
+  it('rechaza compra para hoy después del cierre del parque sin enviar mail', () => {
+    const enviarMail = vi.fn();
+    expect(() => comprarEntradas(pedidoValido({ fecha: '2026-10-07' }), {
+      hoy: new Date(2026, 9, 7, 19, 1), enviarMail,
+    })).toThrow('17:30');
+    expect(enviarMail).not.toHaveBeenCalled();
+  });
+  it.each([[0, 0], [3, 0], [4, .5], [15, .5], [16, 1], [59, 1], [60, .5], [120, .5]])('descuento a los %i a?os', (edad, factor) => {
+    expect(calcularTotal(1, 'REGULAR', [edad])).toBe(10000 * factor);
+    expect(calcularTotal(1, 'VIP', [edad])).toBe(20000 * factor);
+  });
+  it.each(['2026-12-25', '2027-01-01'])('rechaza feriado %s', fecha => {
+    expect(() => comprarEntradas(pedidoValido({ fecha }), { hoy: new Date(2026, 11, 10) })).toThrow('cerrado');
+  });
+  it('acepta el mes exacto y rechaza excederlo', () => {
+    expect(comprar(pedidoValido({ fecha: '2026-11-07' })).cantidad).toBe(2);
+    expect(() => comprar(pedidoValido({ fecha: '2026-11-08' }))).toThrow('un mes');
+  });
+  it('cierra la venta del d?a despu?s de las 17:30', () => {
+    const pedido = pedidoValido({ fecha: '2026-10-07' });
+    expect(comprarEntradas(pedido, { hoy: new Date(2026, 9, 7, 17, 30) }).cantidad).toBe(2);
+    expect(() => comprarEntradas(pedido, { hoy: new Date(2026, 9, 7, 17, 30, 1) })).toThrow('17:30');
+  });
+  it('rechaza fechas inexistentes', () => {
+    expect(() => comprar(pedidoValido({ fecha: '2026-02-31' }))).toThrow('fecha de visita');
   });
 });
