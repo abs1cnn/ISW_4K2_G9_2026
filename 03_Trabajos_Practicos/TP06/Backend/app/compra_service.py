@@ -28,6 +28,7 @@ ESTADO_PENDIENTE_PAGO = "PENDIENTE_PAGO_BOLETERIA"
 DIAS_ABIERTO = (1, 2, 3, 4, 5, 6)
 
 FORMATO_EMAIL = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+FORMATO_FECHA = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
 
 class CompraInvalidaError(Exception):
@@ -65,7 +66,8 @@ def es_entero(valor: Any) -> bool:
 
 
 def parsear_fecha(texto: Optional[str]) -> Optional[date]:
-    if not texto:
+    """Acepta únicamente AAAA-MM-DD y comprueba que la fecha exista."""
+    if not isinstance(texto, str) or not FORMATO_FECHA.fullmatch(texto):
         return None
     try:
         return date.fromisoformat(texto)

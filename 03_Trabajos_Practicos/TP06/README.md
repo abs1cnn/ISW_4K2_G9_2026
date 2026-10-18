@@ -1,5 +1,8 @@
 # TP06 - TDD: Comprar entradas (EcoHarmony Park)
 
+Evidencia de un ciclo Red → Green → Refactor ejecutado para validar el formato
+de fecha de compra: [registro y resultados](EvidenciaTDD/README.md).
+
 - `Backend/`: FastAPI + SQLite + pytest
 - `Frontend/`: React (Vite) + Vitest
 
