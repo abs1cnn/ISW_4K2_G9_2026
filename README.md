@@ -32,8 +32,10 @@ Grupo 9
 | **Resúmenes de unidad**         | `Res_[tema].[extensión]`                 | `02_Unidades/U[numero_de_unidad]/Resumenes/`         | `.pdf`, `.docx`, `.md`                           |
 | **Trabajos prácticos**          | `TP[numero]`                              | `03_Trabajos_Practicos/`                             | No aplica (carpeta)                                    |
 | **Consignas**                    | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Consigna/`         | `.pdf`, `.docx`                                    |
+| **Backend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Backend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.py`              |
+| **Frontend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Frontend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.html`, `.css`             |
+| **User Stories de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/UserStories/`       | `.pdf`, `.docx`, `.xlsx`, `.txt`            |
 | **Desarrollo de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Desarrollo/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
-| **Entregas de TP**               | `Entrega_TP[numero].[extensión]`         | `03_Trabajos_Practicos/TP[numero]/Entrega/`          | `.pdf`, `.zip`                                     |
 | **Primer parcial - anteriores**  | `[año]_[tema].[extensión]`              | `04_Parciales/Primer_Parcial/Parciales_Anteriores/`  | `.pdf`                                               |
 | **Primer parcial - ejercicios**  | `Ej_[tema].[extensión]`                  | `04_Parciales/Primer_Parcial/Ejercicios/`            | `.pdf`, `.docx`                                    |
 | **Primer parcial - resúmenes**  | `Res_[tema].[extensión]`                 | `04_Parciales/Primer_Parcial/Resumenes/`             | `.pdf`, `.docx`, `.md`                           |
