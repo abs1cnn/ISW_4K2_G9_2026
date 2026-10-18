@@ -2,7 +2,8 @@
 
 import re
 from dataclasses import dataclass, field
-from datetime import date
+from calendar import monthrange
+from datetime import date, datetime, time
 from typing import Any, Callable, Optional
 
 MAX_ENTRADAS = 10
@@ -13,8 +14,8 @@ TIPO_PASE_VIP = "VIP"
 TIPOS_PASE = (TIPO_PASE_REGULAR, TIPO_PASE_VIP)
 
 PRECIOS = {
-    TIPO_PASE_REGULAR: 5000,
-    TIPO_PASE_VIP: 10000,
+    TIPO_PASE_REGULAR: 10000,
+    TIPO_PASE_VIP: 20000,
 }
 
 # Por ahora solo se admite pago en efectivo (en boletería)
@@ -73,17 +74,22 @@ def parsear_fecha(texto: Optional[str]) -> Optional[date]:
 
 
 def parque_abierto(fecha: date) -> bool:
-    return fecha.weekday() in DIAS_ABIERTO
+    return fecha.weekday() in DIAS_ABIERTO and (fecha.month, fecha.day) not in ((12, 25), (1, 1))
 
 
-def calcular_total(cantidad: Any, tipo_pase: Optional[str]) -> int:
+def calcular_total(cantidad: Any, tipo_pase: Optional[str], edades=None) -> int:
     precio = PRECIOS.get(tipo_pase)
     if precio is None or not es_entero(cantidad) or cantidad < 1:
         return 0
-    return cantidad * precio
+    return sum(0 if edad <= 3 else precio // 2 if edad <= 15 or edad >= 60 else precio for edad in edades) if edades is not None else cantidad * precio
 
 
 def validar_pedido(pedido: Pedido, hoy: date) -> list[str]:
+    ahora = hoy if isinstance(hoy, datetime) else datetime.combine(hoy, time.min)
+    hoy = ahora.date()
+    mes = hoy.month % 12 + 1
+    anio = hoy.year + (hoy.month == 12)
+    limite = date(anio, mes, min(hoy.day, monthrange(anio, mes)[1]))
     errores = []
 
     email = (pedido.email or "").strip()
@@ -97,8 +103,12 @@ def validar_pedido(pedido: Pedido, hoy: date) -> list[str]:
         errores.append("Debe indicar la fecha de visita")
     elif fecha < hoy:
         errores.append("La fecha de visita debe ser hoy o una fecha futura")
+    elif fecha > limite:
+        errores.append("La anticipación máxima es de un mes")
+    elif fecha == hoy and ahora.time() > time(17, 30):
+        errores.append("Las compras para hoy cierran a las 17:30")
     elif not parque_abierto(fecha):
-        errores.append("El parque está cerrado ese día (cierra los lunes)")
+        errores.append("El parque está cerrado ese día (lunes, 25 de diciembre y 1 de enero)")
 
     cantidad = pedido.cantidad
     if not es_entero(cantidad) or cantidad < 1:
@@ -140,7 +150,7 @@ def comprar_entradas(
         edades=list(pedido.edades),
         tipo_pase=pedido.tipo_pase,
         forma_pago=pedido.forma_pago,
-        total=calcular_total(pedido.cantidad, pedido.tipo_pase),
+        total=calcular_total(pedido.cantidad, pedido.tipo_pase, pedido.edades),
     )
     compra.id = guardar_compra(compra)
     compra.mensaje = (

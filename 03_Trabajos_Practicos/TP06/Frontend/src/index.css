@@ -1,16 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap');
 :root {
-  --verde: #2e7d32;
-  --verde-claro: #e8f5e9;
-  --texto: #1b1b1b;
-  --borde: #c8d6c9;
-  --error: #c62828;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --verde: #386641;
+  --verde-medio: #6A994E;
+  --verde-claro: #A7C957;
+  --crema: #F2E8CF;
+  --texto: var(--verde);
+  --borde: var(--verde-claro);
+  --error: #BC4749;
+  font-family: 'Lato', sans-serif;
   color: var(--texto);
 }
 
 * { box-sizing: border-box; }
 
-body { margin: 0; background: #f4faf4; }
+body { margin: 0; background: var(--crema); }
 
 .app { position: relative; min-height: 100vh; }
 .app { padding-bottom: 76px; }
@@ -23,19 +26,19 @@ body { margin: 0; background: #f4faf4; }
 
 .encabezado {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 16px; background: var(--verde); color: white;
+  padding: 12px 16px; background: var(--verde); color: var(--crema);
 }
 
 .nav-inferior {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 2;
   display: flex; justify-content: space-around;
-  background: white; border-top: 1px solid var(--borde);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  background: var(--crema); border-top: 1px solid var(--borde);
+  box-shadow: 0 -2px 10px rgba(56, 102, 65, 0.12);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
 }
 .nav-item {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
-  background: transparent; color: #7a8a7b; font-size: 0.75rem; padding: 6px 4px;
+  background: transparent; color: var(--verde); font-size: 0.75rem; padding: 6px 4px;
   text-decoration: none;
 }
 a.nav-item:hover { color: var(--verde); }
@@ -47,15 +50,15 @@ a.nav-item:hover { color: var(--verde); }
 .contenido { display: flex; justify-content: center; padding: 24px 16px; }
 
 .tarjeta {
-  width: 100%; max-width: 480px; background: white; border-radius: 12px;
-  padding: 24px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  width: 100%; max-width: 480px; background: var(--crema); border-radius: 12px;
+  padding: 24px; box-shadow: 0 2px 10px rgba(56, 102, 65, 0.16);
   display: flex; flex-direction: column; gap: 14px;
 }
 .tarjeta h2 { margin: 0 0 4px; color: var(--verde); }
 
 label { display: flex; flex-direction: column; gap: 4px; font-size: 0.95rem; }
 label.opcion { flex-direction: row; align-items: center; gap: 8px; }
-small, .ayuda { color: #666; font-size: 0.85rem; }
+small, .ayuda { color: var(--verde); font-size: 0.85rem; }
 
 input:not([type='radio']) {
   padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: 1rem;
@@ -67,11 +70,30 @@ legend { padding: 0 4px; font-weight: 600; }
 
 button {
   padding: 10px 14px; border: none; border-radius: 6px; background: var(--verde);
-  color: white; font-size: 1rem; cursor: pointer;
+  color: var(--crema); font-size: 1rem; cursor: pointer;
 }
 button:hover { opacity: 0.9; }
-.boton-secundario { background: transparent; border: 1px solid white; padding: 6px 10px; font-size: 0.85rem; }
+.boton-secundario { background: transparent; border: 1px solid var(--crema); padding: 6px 10px; font-size: 0.85rem; }
 
 .total { font-size: 1.1rem; font-weight: 600; margin: 0; }
 .error { color: var(--error); margin: 0; font-size: 0.9rem; }
 ul.error { padding-left: 18px; }
+
+button:disabled { opacity: .6; cursor: wait; }
+input, button { font-family: inherit; }
+
+.resumen-compra { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--borde); border-radius: 8px; }
+.resumen-compra h3 { margin: 0; font-size: 1.05rem; }
+.resumen-fila { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: .9rem; }
+.resumen-fila > :last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.descuento-aplicado { color: var(--verde); }
+.resumen-compra .total { border-top: 1px solid var(--verde-medio); padding-top: 12px; flex-wrap: wrap; font-size: 1rem; }
+
+input { color: var(--texto); background: var(--crema); accent-color: var(--verde); }
+input::placeholder { color: var(--verde); opacity: .8; }
+input:not([type='radio']) { border-color: var(--verde-medio); }
+input:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 3px;
+}
+.nav-item.activo { background: var(--verde-claro); border-radius: 6px; }

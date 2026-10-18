@@ -63,29 +63,31 @@ PRUEBAS DE USUARIO
 -- Fecha --
 13. Probar comprar entradas ingresando una fecha de visita pasada (falla).
 14. Probar comprar entradas sin ingresar fecha de visita (falla).
+15. Probar comprar entrada para el dia de hoy, pasada la fecha de cierre del parque (falla)
 
 -- Cantidad --
-15. Probar comprar entradas ingresando cantidad 0 (falla).
-16. Probar comprar entradas ingresando una cantidad negativa (falla).
-17. Probar comprar 11 entradas (valor límite superior + 1) (falla).
+16. Probar comprar entradas ingresando cantidad 0 (falla).
+17. Probar comprar entradas ingresando una cantidad negativa (falla).
+18. Probar comprar 11 entradas (valor límite superior + 1) (falla).
 
 -- Visitantes / edades --
-18. Probar comprar entradas sin indicar la edad de alguno de los
+19. Probar comprar entradas sin indicar la edad de alguno de los
     visitantes (falla).
-19. Probar comprar entradas donde la cantidad de edades ingresadas no
+20. Probar comprar entradas donde la cantidad de edades ingresadas no
     coincide con la cantidad de entradas solicitadas (falla).
-20. Probar comprar entradas ingresando una edad inválida (negativa o
+21. Probar comprar entradas ingresando una edad inválida (negativa o
     no numérica) (falla).
+22. Probar comprar entrada para mayor de 60 años y que le aplique descuento del 50% (pasa)
 
 -- Tipo de pase --
-21. Probar comprar entradas sin seleccionar tipo de pase (falla).
-22. Probar comprar entradas con un tipo de pase distinto de VIP o regular
+23. Probar comprar entradas sin seleccionar tipo de pase (falla).
+24. Probar comprar entradas con un tipo de pase distinto de VIP o regular
     (falla).
 
 -- Forma de pago --
-23. Probar comprar entradas con una forma de pago distinta de efectivo o
+25. Probar comprar entradas con una forma de pago distinta de efectivo o
     tarjeta (falla).
-24. Probar comprar entradas con tarjeta y que Mercado Pago rechace el
+26. Probar comprar entradas con tarjeta y que Mercado Pago rechace el
     pago; no se registra la compra ni se envía el mail de confirmación
     (falla).
 

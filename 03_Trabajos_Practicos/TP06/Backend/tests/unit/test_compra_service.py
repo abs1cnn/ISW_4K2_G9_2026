@@ -33,7 +33,7 @@ def test_comprar_entradas(repo_falso):
     assert compra.id == 1
     assert compra.cantidad == 3
     assert compra.fecha.isoformat() == FECHA_ABIERTO
-    assert compra.total == 3 * PRECIOS["VIP"]
+    assert compra.total == 2.5 * PRECIOS["VIP"]
     assert compra.estado == ESTADO_PENDIENTE_PAGO
     assert len(repo_falso.compras) == 1
 
@@ -135,3 +135,63 @@ def test_calcular_total_multiplica_cantidad_por_precio():
 @pytest.mark.parametrize("cantidad", [-3, 0])
 def test_calcular_total_devuelve_cero_para_cantidades_no_positivas(cantidad):
     assert calcular_total(cantidad, "VIP") == 0
+
+
+@pytest.mark.parametrize("edad,factor", [(0, 0), (3, 0), (4, .5), (15, .5), (16, 1), (59, 1), (60, .5), (120, .5)])
+@pytest.mark.parametrize("pase", ["REGULAR", "VIP"])
+def test_descuentos_po(edad, factor, pase):
+    assert calcular_total(1, pase, [edad]) == PRECIOS[pase] * factor
+
+
+def test_precios_po():
+    assert PRECIOS == {"REGULAR": 10000, "VIP": 20000}
+
+
+@pytest.mark.parametrize("edad", [0, 3, 4, 15, 16, 59, 60, 61])
+@pytest.mark.parametrize("pase,precio", [("REGULAR", 10000), ("VIP", 20000)])
+def test_compra_aplica_descuento_por_edad_y_lo_informa_en_mail(repo_falso, edad, pase, precio):
+    esperado = 0 if edad <= 3 else precio // 2 if edad <= 15 or edad >= 60 else precio
+    compra = comprar(pedido_valido(cantidad=1, edades=[edad], tipo_pase=pase), repo_falso)
+    assert compra.total == esperado
+    assert repo_falso.compras[0].total == esperado
+    assert f"${esperado}" in repo_falso.mails[0][1]
+
+
+def test_comprar_para_hoy_despues_del_cierre_no_guarda_ni_envia_mail(repo_falso):
+    from datetime import datetime
+    with pytest.raises(CompraInvalidaError, match="17:30"):
+        comprar_entradas(
+            pedido_valido(fecha=HOY.isoformat()),
+            hoy=datetime(2026, 10, 7, 19, 1),
+            guardar_compra=repo_falso.guardar_compra,
+            enviar_mail=repo_falso.enviar_mail,
+        )
+    assert repo_falso.compras == []
+    assert repo_falso.mails == []
+
+
+@pytest.mark.parametrize("fecha", ["2026-12-25", "2027-01-01"])
+def test_feriados_po(fecha):
+    from app.compra_service import parque_abierto
+    from datetime import date
+    assert not parque_abierto(date.fromisoformat(fecha))
+
+
+@pytest.mark.parametrize("hora,minuto,segundo,permitido", [(17, 29, 59, True), (17, 30, 0, True), (17, 30, 1, False), (18, 0, 0, False)])
+def test_corte_horario_po(hora, minuto, segundo, permitido):
+    from datetime import datetime
+    from app.compra_service import validar_pedido
+    errores = validar_pedido(pedido_valido(fecha="2026-10-07"), datetime(2026, 10, 7, hora, minuto, segundo))
+    assert (not errores) == permitido
+
+
+@pytest.mark.parametrize("fecha,permitido", [("2026-11-07", True), ("2026-11-08", False)])
+def test_mes_anticipacion_po(fecha, permitido):
+    from app.compra_service import validar_pedido
+    assert (not validar_pedido(pedido_valido(fecha=fecha), HOY)) == permitido
+
+
+def test_mes_calendario_fin_de_mes():
+    from datetime import date
+    from app.compra_service import validar_pedido
+    assert not validar_pedido(pedido_valido(fecha="2027-02-28"), date(2027, 1, 31))
