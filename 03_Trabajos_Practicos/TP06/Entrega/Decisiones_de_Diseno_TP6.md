@@ -217,7 +217,7 @@ logo requiere validación del PO y no se considera aprobado por este documento.
 ## 14. Referencias del proyecto
 
 - Aclaraciones de dominio: `Consigna/requerimientos_PO.pdf`.
-- Historia de usuario: `UserHistoria/US_Comprar_Entradas.txt`.
+- Historia de usuario: `UserStories/US_Comprar_Entradas.txt`.
 - Reglas y objetos de dominio: `Backend/app/compra_service.py`.
 - Endpoints y dependencias: `Backend/app/main.py`.
 - Persistencia y límite acumulado: `Backend/app/database.py`.
