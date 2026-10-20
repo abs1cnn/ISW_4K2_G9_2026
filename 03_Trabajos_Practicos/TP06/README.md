@@ -1,5 +1,11 @@
 # TP06 - TDD: Comprar entradas (EcoHarmony Park)
 
+Documento de entrega: [Justificación de las decisiones de diseño](Entrega/Decisiones_de_Diseno_TP6.md).
+Documento complementario: [Reglas de estilo de código](Entrega/Reglas_de_Estilo_TP6.md).
+
+Evidencia de un ciclo Red → Green → Refactor ejecutado para validar el formato
+de fecha de compra: [registro y resultados](EvidenciaTDD/README.md).
+
 - `Backend/`: FastAPI + SQLite + pytest
 - `Frontend/`: React (Vite) + Vitest
 
