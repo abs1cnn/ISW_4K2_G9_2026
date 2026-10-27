@@ -79,7 +79,7 @@ ISW/
 │       ├── Desarrollo/
 │       ├── Frontend/
 │       ├── Backend/
-│       ├── UserStorie/
+│       ├── UserStories/
 │       └── Entrega/ 
 │
 ├── 04_Parciales/
