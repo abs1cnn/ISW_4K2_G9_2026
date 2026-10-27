@@ -126,7 +126,7 @@ FUERA DE ALCANCE
 SUPUESTOS DE NEGOCIO
 ---------------------------------------------------------------------------
 - El parque abre de martes a domingo y cierra los lunes.
-- Precios: pase REGULAR $5000, pase VIP $10000. El total es
+- Precios: pase REGULAR $10000, pase VIP $20000. El total es
   cantidad x precio del pase.
 - Edad válida de un visitante: número entero entre 0 y 120.
 - La fecha se recibe en formato ISO (AAAA-MM-DD).
@@ -289,8 +289,3 @@ Iteración 9 - Integración con la API
 El mismo enfoque se aplicó en el Frontend (compraService.test.js con
 Vitest) para las validaciones del lado del cliente.
 
----------------------------------------------------------------------------
-RESULTADO
----------------------------------------------------------------------------
-- Backend: 45 tests (unitarios + integración) en verde (pytest).
-- Frontend: 30 tests en verde (Vitest).
