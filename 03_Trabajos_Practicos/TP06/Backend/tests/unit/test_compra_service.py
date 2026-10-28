@@ -103,6 +103,11 @@ def test_comprar_entradas_sin_fecha_o_fecha_mal_formada_falla(repo_falso, fecha)
     esperar_error(pedido_valido(fecha=fecha), repo_falso, "fecha de visita")
 
 
+@pytest.mark.parametrize("fecha", ["20261010", "2026-W41-6"])
+def test_compra_rechaza_fecha_fuera_del_formato_aaaa_mm_dd(repo_falso, fecha):
+    esperar_error(pedido_valido(fecha=fecha), repo_falso, "fecha de visita")
+
+
 @pytest.mark.parametrize("cantidad", [0, -1, -5, None, "3", 2.5])
 def test_comprar_entradas_cantidad_invalida_o_negativa_falla(repo_falso, cantidad):
     esperar_error(pedido_valido(cantidad=cantidad, edades=[]), repo_falso, "al menos 1")
