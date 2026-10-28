@@ -53,6 +53,7 @@ Grupo 9
 | **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                    |
 | **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/Desarrollo/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |
 | **Entregas TI**                  | `Entrega_TI[numero].[extensión]`         | `07_Trabajos_Investigacion/TI[numero]/Entrega/`      | `.pdf`, `.zip`                                     |
+| **Planificación de cátedra**    | `ISW_[nombre_del_documento].[extensión]` | `08_Planificacion_Catedra/`                          | `.pdf`, `.docx`, `.xlsx`, `.txt`                 |
 
 ## Estructura del repositorio
 
@@ -98,16 +99,18 @@ ISW/
 │   ├── Resumenes/
 │   └── Ejercicios/
 │
-└── 06_Clases/
+├── 06_Clases/
 │   ├── Apuntes/
 │   ├── Grabaciones/
 │   └── Presentaciones/
 │  
-└── 07_Trabajos_Investigacion/
-    ├── Lineamientos/
-    └── TI<<Nro>>/
-        ├── Desarrollo/
-        └── Entrega/
+├── 07_Trabajos_Investigacion/
+│   ├── Lineamientos/
+│   └── TI<<Nro>>/
+│       ├── Desarrollo/
+│       └── Entrega/
+│
+└── 08_Planificacion_Catedra/
 ```
 
 ## Glosario
