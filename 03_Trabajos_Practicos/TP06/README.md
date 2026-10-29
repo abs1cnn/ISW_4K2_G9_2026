@@ -9,6 +9,31 @@ de fecha de compra: [registro y resultados](EvidenciaTDD/README.md).
 - `Backend/`: FastAPI + SQLite + pytest
 - `Frontend/`: React (Vite) + Vitest
 
+## Pipeline CI/CD
+
+El workflow [CI/CD TP06](../../.github/workflows/cicd.yml) muestra un flujo con
+GitHub Actions:
+
+1. En cada pull request que modifica TP06 se ejecutan en paralelo `pytest`,
+   los tests de Vitest y el build de produccion de Vite.
+2. Solo si ambas validaciones pasan, se empaquetan el backend y el build del
+   frontend como un artefacto versionado con commit y ejecucion de origen.
+3. Al integrar cambios en `main`, se ejecuta el paso de deploy demostrativo
+   sobre el entorno `staging`. Tambien puede iniciarse manualmente desde
+   **Actions > CI/CD TP06 > Run workflow**.
+4. Para simular un rollback, iniciar el workflow manualmente con la operacion
+   `rollback` e indicar en `artifact_run_id` el ID de una ejecucion anterior
+   exitosa. El workflow recupera el paquete validado de esa ejecucion y muestra
+   la version y el hash que se restaurarian.
+
+El despliegue y el rollback son intencionalmente demostrativos: este repositorio
+no tiene un servidor ni proveedor de hosting configurado. Los artefactos se
+conservan durante 30 dias. Para convertirlo en un despliegue real, se debe
+conectar el paso de deploy con el proveedor elegido, agregar una comprobacion de
+salud posterior al despliegue y hacer que el rollback restaure en ese proveedor
+el ultimo paquete estable. En GitHub, se pueden configurar revisores requeridos
+en el entorno `staging` para agregar una aprobacion antes de esos pasos.
+
 ## Backend
 
 ```bash
