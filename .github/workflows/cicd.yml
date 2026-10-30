@@ -34,6 +34,9 @@ jobs:
   backend-tests:
     name: Backend - instalar dependencias y ejecutar pytest
     runs-on: ubuntu-latest
+    env:
+      SMTP_USER: "ci-test@example.com"
+      SMTP_PASSWORD: "fake-ci-password"
     defaults:
       run:
         working-directory: 03_Trabajos_Practicos/TP06/Backend
