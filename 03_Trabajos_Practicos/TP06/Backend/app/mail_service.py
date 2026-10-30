@@ -41,5 +41,5 @@ def get_mail_service():
         host="smtp.gmail.com",
         port=587,
         emisor="tucorre@gmail.com",    # este esel correo de HecoArmony Park, reemplazar por el correo real
-        password="password generada por google"  # Contraseña para que la app ´ppueda m,andar o tengapermisos de usar el gmail esto se hace desde google account settings
+        password="password generada por google"  # Contraseña para que la app ´ppueda mandar o tenga permisos de usar el gmail esto se hace desde google account settings
     )
