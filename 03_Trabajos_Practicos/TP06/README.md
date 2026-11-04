@@ -17,6 +17,16 @@ python -m venv .venv
 .venv\Scripts\activate          # Windows (en Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
 
+# Configuración de mail real (opcional, pero activada si se define la password)
+# 1) Crear una App Password en Google para la cuenta: abigailcanaan@gmail.com
+# 2) Exportar la variable antes de levantar la API:
+#   $env:ECOHARMONY_EMAIL_PASSWORD = "tu_app_password"   # PowerShell
+#   export ECOHARMONY_EMAIL_PASSWORD="tu_app_password"    # Bash/Zsh
+# 3) Si querés cambiar la cuenta remitente o el SMTP:
+#   $env:ECOHARMONY_EMAIL_FROM = "abigailcanaan@gmail.com"
+#   $env:ECOHARMONY_SMTP_HOST = "smtp.gmail.com"
+#   $env:ECOHARMONY_SMTP_PORT = "587"
+
 uvicorn app.main:app --reload --port 8000   # levanta la API
 pytest -v                                   # corre todos los tests
 pytest tests/unit -v                        # solo unitarios

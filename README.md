@@ -50,8 +50,8 @@ Grupo 9
 | **Grabaciones**                  | `[fecha]_[tema].[extensión]`             | `06_Clases/Grabaciones/`                             | `.mp4`, `.mp3`                                     |
 | **Trabajos de investigación**   | `TI[numero]`                              | `07_Trabajos_Investigacion/`                         | No aplica (carpeta)                                    |
 | **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                    |
-| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/Desarrollo/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |
-| **Entregas TI**                  | `Entrega_TI[numero].[extensión]`         | `07_Trabajos_Investigacion/TI[numero]/Entrega/`      | `.pdf`, `.zip`                                     |
+| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |
+                                  |
 
 ## Estructura del repositorio
 
@@ -105,8 +105,7 @@ ISW/
 └── 07_Trabajos_Investigacion/
     ├── Lineamientos/
     └── TI<<Nro>>/
-        ├── Desarrollo/
-        └── Entrega/
+
 ```
 
 ## Glosario
