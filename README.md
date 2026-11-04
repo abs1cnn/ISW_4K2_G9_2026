@@ -51,8 +51,7 @@ Grupo 9
 | **Grabaciones**                  | `[fecha]_[tema].[extensión]`             | `06_Clases/Grabaciones/`                             | `.mp4`, `.mp3`                                     |
 | **Trabajos de investigación**   | `TI[numero]`                              | `07_Trabajos_Investigacion/`                         | No aplica (carpeta)                                    |
 | **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                    |
-| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |
-                                  |
+| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |                                  |
 | **Planificación de cátedra**    | `ISW_[nombre_del_documento].[extensión]` | `08_Planificacion_Catedra/`                          | `.pdf`, `.docx`, `.xlsx`, `.txt`                 |
 
 ## Estructura del repositorio
