@@ -21,6 +21,7 @@ from app.compra_service import (
     comprar_entradas,
 )
 from app.database import Repositorio, get_repositorio
+from app.mail_service import enviar_confirmacion_compra
 from app.test_runner import ejecutar_tests
 
 app = FastAPI(title="EcoHarmony Park - API")
@@ -79,12 +80,24 @@ def crear_compra(
 ):
     try:
         datos.email = sesion()["email"]  # Sesión mock autorizada por el PO.
+<<<<<<< HEAD
+
+        def enviar_mail(destinatario: str, mensaje: str):
+            repo.guardar_mail(destinatario, mensaje)
+            enviar_confirmacion_compra(destinatario, mensaje)
+
+=======
     
+>>>>>>> 560bff255f7e278dc140a01d612b1f1b3b985a70
         compra = comprar_entradas(
             Pedido(**datos.model_dump()),
             hoy=hoy,
             guardar_compra=repo.guardar_compra,
+<<<<<<< HEAD
+            enviar_mail=enviar_mail,
+=======
             enviar_mail=notificador.enviar_mail,
+>>>>>>> 560bff255f7e278dc140a01d612b1f1b3b985a70
         )
     except CompraInvalidaError as error:
         return JSONResponse(status_code=422, content={"errores": error.errores})
