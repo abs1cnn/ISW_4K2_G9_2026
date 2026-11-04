@@ -36,6 +36,7 @@ Grupo 9
 | **Frontend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Frontend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.html`, `.css`             |
 | **User Stories de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/UserStories/`       | `.pdf`, `.docx`, `.xlsx`, `.txt`            |
 | **Desarrollo de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Desarrollo/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
+| **Entraga documentacion de TP**             | `TP_[numTP]_[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Entrega/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
 | **Primer parcial - anteriores**  | `[año]_[tema].[extensión]`              | `04_Parciales/Primer_Parcial/Parciales_Anteriores/`  | `.pdf`                                               |
 | **Primer parcial - ejercicios**  | `Ej_[tema].[extensión]`                  | `04_Parciales/Primer_Parcial/Ejercicios/`            | `.pdf`, `.docx`                                    |
 | **Primer parcial - resúmenes**  | `Res_[tema].[extensión]`                 | `04_Parciales/Primer_Parcial/Resumenes/`             | `.pdf`, `.docx`, `.md`                           |
@@ -52,6 +53,7 @@ Grupo 9
 | **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                    |
 | **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |
                                   |
+| **Planificación de cátedra**    | `ISW_[nombre_del_documento].[extensión]` | `08_Planificacion_Catedra/`                          | `.pdf`, `.docx`, `.xlsx`, `.txt`                 |
 
 ## Estructura del repositorio
 
@@ -78,7 +80,7 @@ ISW/
 │       ├── Desarrollo/
 │       ├── Frontend/
 │       ├── Backend/
-│       ├── UserStorie/
+│       ├── UserStories/
 │       └── Entrega/ 
 │
 ├── 04_Parciales/
@@ -97,15 +99,16 @@ ISW/
 │   ├── Resumenes/
 │   └── Ejercicios/
 │
-└── 06_Clases/
+├── 06_Clases/
 │   ├── Apuntes/
 │   ├── Grabaciones/
 │   └── Presentaciones/
 │  
-└── 07_Trabajos_Investigacion/
-    ├── Lineamientos/
-    └── TI<<Nro>>/
-
+├── 07_Trabajos_Investigacion/
+│   ├── Lineamientos/
+│   └── TI<<Nro>>/
+│
+└── 08_Planificacion_Catedra/
 ```
 
 ## Glosario

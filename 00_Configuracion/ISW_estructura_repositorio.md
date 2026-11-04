@@ -38,14 +38,14 @@ ISW/
 │   ├── Resumenes/
 │   └── Ejercicios/
 │
-└── 06_Clases/
-    ├── Presentaciones/
-    ├── Apuntes/
-    └── Grabaciones/
-
-└── 07_Trabajos_Investigacion/
-    ├── Lineamientos/
-    └── TI<<Nro>>/
-        ├── Desarrollo/
-        └── Entrega/
+├── 06_Clases/
+│   ├── Presentaciones/
+│   ├── Apuntes/
+│   └── Grabaciones/
+│
+├── 07_Trabajos_Investigacion/
+│   ├── Lineamientos/
+│   └── TI<<Nro>>/
+│
+└── 08_Planificacion_Catedra/
 ```
