@@ -152,12 +152,11 @@ el backend intenta enviar el correo mediante SMTP cuando están configuradas las
 variables `ECOHARMONY_EMAIL_FROM` y `ECOHARMONY_EMAIL_PASSWORD`. Si faltan las credenciales, no se intenta el envío SMTP. Si ocurre un error durante el intento, se registra el fallo y la compra ya persistida no se anula. El sistema no garantiza ni acredita la entrega del correo al destinatario.
 
 La configuración `ECOHARMONY_SMTP_PORT` debe contener un número entero.
-Actualmente, su conversión se realiza antes del manejo de excepciones del
-servicio SMTP. Si contiene un valor no numérico, la API puede responder con
-un error HTTP 500 aunque la compra y su confirmación ya estén guardadas.
-Además, el sistema no registra un estado de entrega del correo: el registro
-local y la aceptación del mensaje por un servidor SMTP no garantizan su
-recepción en el buzón del destinatario.
+Si se configura un valor no numérico, el servicio captura la excepción,
+registra el fallo y devuelve `False`, sin interrumpir la compra ya persistida.
+El sistema no registra un estado de entrega del correo: ni el registro
+local ni la aceptación por un servidor SMTP garantizan su recepción
+en el buzón del destinatario.
 
 Las operaciones de guardar y enviar confirmación se pasan al servicio como
 funciones. En los tests unitarios se reemplazan por un repositorio en memoria,
@@ -219,7 +218,10 @@ pruebas y los endpoints de listado de compras y mails no tienen control de acces
 Antes de un despliegue público se necesitarían autenticación, autorización y
 una definición del acceso a esos datos y herramientas.
 
-No forman parte de esta entrega la pasarela de pago, una infraestructura de correo con entrega garantizada, la gestión completa de usuarios ni la inscripción a actividades.
+No forman parte de esta entrega la pasarela de pago, una infraestructura
+de correo con entrega garantizada, la gestión completa de usuarios ni
+la inscripción a actividades. El diseño del logo requiere validación
+del PO y no se considera aprobado por este documento.
 
 ## 14. Referencias del proyecto
 

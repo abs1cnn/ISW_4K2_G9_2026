@@ -48,9 +48,13 @@ Complementa [Decisiones de diseno](Decisiones_de_Diseno_TP6.md).
 - Nombre: `test_<acción>_<resultado esperado>`, por ejemplo `test_comprar_entradas_parque_cerrado_falla`.
 - Estructura **Arrange / Act / Assert**; un concepto por test.
 - Los casos con varios valores usan parametrización (`pytest.mark.parametrize`, `it.each`) en lugar de duplicar tests.
-- En los tests unitarios se sustituyen las dependencias externas por dobles de prueba. Los tests de integración utilizan una base SQLite temporal y un reloj controlado, pero todavía no sustituyen explícitamente el servicio SMTP. Si hay credenciales reales configuradas, podrían intentar establecer una conexión de red.Los servicios externos se reemplazan por dobles de prueba; los tests no dependen de la hora real, de la red ni de `ecoharmony.db`
 - Los tests de fallo verifican además que **no** hubo efectos secundarios (sin compra guardada, sin mail enviado).
 - Datos de prueba compartidos en `conftest.py`; cada test modifica solo lo que quiere probar (`pedido_valido(**cambios)`).
+- En los tests unitarios se sustituyen las dependencias externas por dobles
+  de prueba. Los tests de integración utilizan una base SQLite temporal y
+  un reloj controlado, pero todavía no sustituyen explícitamente el servicio
+  SMTP. Si hay credenciales reales configuradas, podrían intentar establecer
+  una conexión de red.
 
 ## 6. Estructura del proyecto
 
