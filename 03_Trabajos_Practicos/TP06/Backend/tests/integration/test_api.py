@@ -67,3 +67,16 @@ def test_sesion_mock_no_admite_suplantacion_por_mail(cliente):
     sesion = cliente.get("/api/sesion").json()
     respuesta = cliente.post("/api/compras", json={**PEDIDO, "email": "otro@mail.com"})
     assert respuesta.json()["email"] == sesion["email"]
+
+def test_api_puerto_smtp_invalido_no_interrumpe_compra(
+    cliente, repo_sqlite, monkeypatch
+):
+    monkeypatch.setenv("ECOHARMONY_EMAIL_FROM", "test@example.com")
+    monkeypatch.setenv("ECOHARMONY_EMAIL_PASSWORD", "password-de-prueba")
+    monkeypatch.setenv("ECOHARMONY_SMTP_PORT", "puerto-invalido")
+
+    respuesta = cliente.post("/api/compras", json=PEDIDO)
+
+    assert respuesta.status_code == 201
+    assert len(repo_sqlite.listar_compras()) == 1
+    assert len(repo_sqlite.listar_mails()) == 1

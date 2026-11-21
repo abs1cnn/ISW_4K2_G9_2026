@@ -10,7 +10,6 @@ def enviar_confirmacion_compra(destinatario: str, mensaje: str) -> bool:
     """Envía la confirmación por SMTP cuando hay credenciales."""
 
     host = os.getenv("ECOHARMONY_SMTP_HOST", "smtp.gmail.com")
-    port = int(os.getenv("ECOHARMONY_SMTP_PORT", "587"))
     remitente = os.getenv("ECOHARMONY_EMAIL_FROM")
     password = os.getenv("ECOHARMONY_EMAIL_PASSWORD")
 
@@ -19,6 +18,7 @@ def enviar_confirmacion_compra(destinatario: str, mensaje: str) -> bool:
         return False
 
     try:
+        port = int(os.getenv("ECOHARMONY_SMTP_PORT", "587"))
         email = EmailMessage()
         email["Subject"] = "Confirmación de compra - EcoHarmony Park"
         email["From"] = remitente
