@@ -20,39 +20,50 @@ Grupo 9
 
 # Reglas de nombrado
 
-| Nombre                                 | Regla de nombrado                           | Ubicación                                             | Extensiones admitidas                                  |
-| -------------------------------------- | ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| **Configuración**               | `ISW_[nombre_del_documento].[extensión]` | `00_Configuracion/`                                  | `.pdf`, `.md`                                               |
-| **Libros**                       | `[titulo_del_libro].[extensión]`         | `01_Bibliografia/Libros/`                            | `.pdf`, `.epub`, `.docx`                         |
-| **Papers**                       | `[titulo_del_paper].[extensión]`         | `01_Bibliografia/Papers/`                            | `.pdf`                                               |
-| **Material complementario**      | `[tema].[extensión]`                     | `01_Bibliografia/Material_Complementario/`           | `.pdf`, `.docx`, `.pptx`, `.xlsx`              |
-| **Unidades**                     | `U[numero_de_unidad]`                     | `02_Unidades/`                                       | No aplica (carpeta)                                    |
-| **Notas**                        | `[tema].[extensión]`                     | `02_Unidades/U[numero_de_unidad]/Notas/`             | `.pdf`, `.pptx`, `.docx`                         |
-| **Práctica**                    | `[tema].[extensión]`                     | `02_Unidades/U[numero_de_unidad]/Practica/`          | `.pdf`, `.docx`, `.xlsx`                         |
-| **Resúmenes de unidad**         | `Res_[tema].[extensión]`                 | `02_Unidades/U[numero_de_unidad]/Resumenes/`         | `.pdf`, `.docx`, `.md`                           |
-| **Trabajos prácticos**          | `TP[numero]`                              | `03_Trabajos_Practicos/`                             | No aplica (carpeta)                                    |
-| **Consignas**                    | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Consigna/`         | `.pdf`, `.docx`                                    |
-| **Backend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Backend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.py`              |
-| **Frontend de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Frontend/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.html`, `.css`             |
-| **User Stories de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/UserStories/`       | `.pdf`, `.docx`, `.xlsx`, `.txt`            |
-| **Desarrollo de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Desarrollo/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
-| **Entraga documentacion de TP**             | `TP_[numTP]_[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Entrega/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`            |
-| **Primer parcial - anteriores**  | `[año]_[tema].[extensión]`              | `04_Parciales/Primer_Parcial/Parciales_Anteriores/`  | `.pdf`                                               |
-| **Primer parcial - ejercicios**  | `Ej_[tema].[extensión]`                  | `04_Parciales/Primer_Parcial/Ejercicios/`            | `.pdf`, `.docx`                                    |
-| **Primer parcial - resúmenes**  | `Res_[tema].[extensión]`                 | `04_Parciales/Primer_Parcial/Resumenes/`             | `.pdf`, `.docx`, `.md`                           |
-| **Segundo parcial - anteriores** | `[año]_[tema].[extensión]`              | `04_Parciales/Segundo_Parcial/Parciales_Anteriores/` | `.pdf`                                               |
-| **Segundo parcial - ejercicios** | `Ej_[tema].[extensión]`                  | `04_Parciales/Segundo_Parcial/Ejercicios/`           | `.pdf`, `.docx`                                    |
-| **Segundo parcial - resúmenes** | `Res_[tema].[extensión]`                 | `04_Parciales/Segundo_Parcial/Resumenes/`            | `.pdf`, `.docx`, `.md`                           |
-| **Finales anteriores**           | `[año]_[tema].[extensión]`              | `05_Final/Finales_Anteriores/`                       | `.pdf`                                               |
-| **Final - resúmenes**           | `Res_[tema].[extensión]`                 | `05_Final/Resumenes/`                                | `.pdf`, `.docx`, `.md`                           |
-| **Final - ejercicios**           | `Ej_[tema].[extensión]`                  | `05_Final/Ejercicios/`                               | `.pdf`, `.docx`                                    |
-| **Presentaciones**               | `[tema].[extensión]`                     | `06_Clases/Presentaciones/`                          | `.pptx`, `.pdf`                                    |
-| **Apuntes**                      | `[tema].[extensión]`                     | `06_Clases/Apuntes/`                                 | `.pdf`, `.docx`, `.md`                           |
-| **Grabaciones**                  | `[fecha]_[tema].[extensión]`             | `06_Clases/Grabaciones/`                             | `.mp4`, `.mp3`                                     |
-| **Trabajos de investigación**   | `TI[numero]`                              | `07_Trabajos_Investigacion/`                         | No aplica (carpeta)                                    |
-| **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                    |
-| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`   | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx` |                                  |
-| **Planificación de cátedra**    | `ISW_[nombre_del_documento].[extensión]` | `08_Planificacion_Catedra/`                          | `.pdf`, `.docx`, `.xlsx`, `.txt`                 |
+| Nombre                                 | Regla de nombrado                           | Ubicación                                             | Extensiones admitidas                                                                           |
+| -------------------------------------- | ------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Configuración**               | `ISW_[nombre_del_documento].[extensión]` | `00_Configuracion/`                                  | `.pdf`, `.md`                                                                               |
+| **Libros**                       | `[titulo_del_libro].[extensión]`         | `01_Bibliografia/Libros/`                            | `.pdf`, `.epub`, `.docx`                                                                  |
+| **Papers**                       | `[titulo_del_paper].[extensión]`         | `01_Bibliografia/Papers/`                            | `.pdf`                                                                                        |
+| **Material complementario**      | `[tema].[extensión]`                     | `01_Bibliografia/Material_Complementario/`           | `.pdf`, `.docx`, `.pptx`, `.xlsx`                                                       |
+| **Unidades**                     | `U[numero_de_unidad]`                     | `02_Unidades/`                                       | No aplica (carpeta)                                                                             |
+| **Notas**                        | `[tema].[extensión]`                     | `02_Unidades/U[numero_de_unidad]/Notas/`             | `.pdf`, `.pptx`, `.docx`                                                                  |
+| **Práctica**                    | `[tema].[extensión]`                     | `02_Unidades/U[numero_de_unidad]/Practica/`          | `.pdf`, `.docx`, `.xlsx`                                                                  |
+| **Resúmenes de unidad**         | `Res_[tema].[extensión]`                 | `02_Unidades/U[numero_de_unidad]/Resumenes/`         | `.pdf`, `.docx`, `.md`                                                                    |
+| **Trabajos prácticos**          | `TP[numero]`                              | `03_Trabajos_Practicos/`                             | No aplica (carpeta)                                                                             |
+| **Consignas**                    | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Consigna/`         | `.pdf`, `.docx`                                                                             |
+| **Backend de TP**                | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Backend/`          | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.py`, `.html`, `.ini`, `.txt`, `.json` |
+| **Frontend de TP**               | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Frontend/`         | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.html`, `.css`, `.js`, `.jsx`, `.json` |
+| **User Stories de TP**           | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/UserStories/`      | `.pdf`, `.docx`, `.xlsx`, `.txt`                                                        |
+| **Evidencia TDD**                | ``[etapa_o_descripcion].[extensión]``      | ``03_Trabajos_Practicos/TP06/EvidenciaTDD/``           | ``.md`, `.txt``                                                                                 |
+| **Desarrollo de TP**             | `[tema].[extensión]`                     | `03_Trabajos_Practicos/TP[numero]/Desarrollo/`       | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.md`                                           |
+| **Entrega documentacion de TP**  | `Entrega_TP[número].[extensión]`        | `03_Trabajos_Practicos/TP[numero]/Entrega/`          | `.pdf`, `.zip`                                                                              |
+| **Primer parcial - anteriores**  | `[año]_[tema].[extensión]`              | `04_Parciales/Primer_Parcial/Parciales_Anteriores/`  | `.pdf`                                                                                        |
+| **Primer parcial - ejercicios**  | `Ej_[tema].[extensión]`                  | `04_Parciales/Primer_Parcial/Ejercicios/`            | `.pdf`, `.docx`                                                                             |
+| **Primer parcial - resúmenes**  | `Res_[tema].[extensión]`                 | `04_Parciales/Primer_Parcial/Resumenes/`             | `.pdf`, `.docx`, `.md`                                                                    |
+| **Segundo parcial - anteriores** | `[año]_[tema].[extensión]`              | `04_Parciales/Segundo_Parcial/Parciales_Anteriores/` | `.pdf`                                                                                        |
+| **Segundo parcial - ejercicios** | `Ej_[tema].[extensión]`                  | `04_Parciales/Segundo_Parcial/Ejercicios/`           | `.pdf`, `.docx`                                                                             |
+| **Segundo parcial - resúmenes** | `Res_[tema].[extensión]`                 | `04_Parciales/Segundo_Parcial/Resumenes/`            | `.pdf`, `.docx`, `.md`                                                                    |
+| **Finales anteriores**           | `[año]_[tema].[extensión]`              | `05_Final/Finales_Anteriores/`                       | `.pdf`                                                                                        |
+| **Final - resúmenes**           | `Res_[tema].[extensión]`                 | `05_Final/Resumenes/`                                | `.pdf`, `.docx`, `.md`                                                                    |
+| **Final - ejercicios**           | `Ej_[tema].[extensión]`                  | `05_Final/Ejercicios/`                               | `.pdf`, `.docx`                                                                             |
+| **Presentaciones**               | `[tema].[extensión]`                     | `06_Clases/Presentaciones/`                          | `.pptx`, `.pdf`                                                                             |
+| **Apuntes**                      | `[tema].[extensión]`                     | `06_Clases/Apuntes/`                                 | `.pdf`, `.docx`, `.md`                                                                    |
+| **Grabaciones**                  | `[fecha]_[tema].[extensión]`             | `06_Clases/Grabaciones/`                             | `.mp4`, `.mp3`                                                                              |
+| **Trabajos de investigación**   | `TI[numero]`                              | `07_Trabajos_Investigacion/`                         | No aplica (carpeta)                                                                             |
+| **Lineamientos**                 | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/Lineamientos/`            | `.pdf`, `.docx`                                                                             |
+| **Desarrollo TI**                | `[tema].[extensión]`                     | `07_Trabajos_Investigacion/TI[numero]/`              | `.pdf`, `.docx`, `.xlsx`, `.drawio`, `.pptx`                                          |
+| **Planificación de cátedra**   | `ISW_[nombre_del_documento].[extensión]` | `08_Planificacion_Catedra/`                          | `.pdf`, `.docx`, `.xlsx`, `.txt`                                                        |
+
+
+
+### Vigencia de las convenciones
+
+Las convenciones de este README rigen para la versión del repositorio en la que están integradas. Toda ampliación propuesta en una rama de trabajo entra en vigor después de su revisión y aprobación mediante Pull Request hacia `main`. Estas convenciones complementan el Plan de Gestión de Configuración original del TP04.
+
+Las carpetas específicas de cada trabajo práctico se utilizan según los artefactos que correspondan; no todas son obligatorias.
+
+Las modificaciones respecto del plan original se documentan en [Actualización del Plan SCM](00_Configuracion/ISW_Actualizacion_Plan_SCM.md).
 
 ## Estructura del repositorio
 

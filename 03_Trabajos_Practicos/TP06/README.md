@@ -1,7 +1,7 @@
 # TP06 - TDD: Comprar entradas (EcoHarmony Park)
 
-Documento de entrega: [Justificación de las decisiones de diseño](Entrega/Decisiones_de_Diseno_TP6.md).
-Documento complementario: [Reglas de estilo de código](Entrega/Reglas_de_Estilo_TP6.md).
+Documento de desarrollo: [Justificación de las decisiones de diseño](Desarrollo/Decisiones_de_Diseno_TP6.md).
+Documento complementario: [Reglas de estilo de código](Desarrollo/Reglas_de_Estilo_TP6.md).
 
 Evidencia de un ciclo Red → Green → Refactor ejecutado para validar el formato
 de fecha de compra: [registro y resultados](EvidenciaTDD/README.md).
@@ -42,15 +42,26 @@ python -m venv .venv
 .venv\Scripts\activate          # Windows (en Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
 
-# Configuración de mail real (opcional, pero activada si se define la password)
-# 1) Crear una App Password en Google para la cuenta: abigailcanaan@gmail.com
-# 2) Exportar la variable antes de levantar la API:
-#   $env:ECOHARMONY_EMAIL_PASSWORD = "tu_app_password"   # PowerShell
-#   export ECOHARMONY_EMAIL_PASSWORD="tu_app_password"    # Bash/Zsh
-# 3) Si querés cambiar la cuenta remitente o el SMTP:
-#   $env:ECOHARMONY_EMAIL_FROM = "abigailcanaan@gmail.com"
-#   $env:ECOHARMONY_SMTP_HOST = "smtp.gmail.com"
-#   $env:ECOHARMONY_SMTP_PORT = "587"
+# Envío de correo real mediante SMTP (opcional).
+# Para habilitarlo, configurar AMBAS variables de entorno.
+#
+# Linux/macOS:
+# export ECOHARMONY_EMAIL_FROM="cuenta@gmail.com"
+# export ECOHARMONY_EMAIL_PASSWORD="tu_app_password"
+#
+# Windows PowerShell:
+# $env:ECOHARMONY_EMAIL_FROM = "cuenta@gmail.com"
+# $env:ECOHARMONY_EMAIL_PASSWORD = "tu_app_password"
+#
+# Configuración SMTP opcional:
+# ECOHARMONY_SMTP_HOST (predeterminado: smtp.gmail.com)
+# ECOHARMONY_SMTP_PORT (predeterminado: 587)
+#
+# Sin credenciales, la confirmación se registra en SQLite,
+# pero no se envía un correo real.
+#
+# ECOHARMONY_SMTP_PORT debe ser un número entero válido.
+# Si no se configura, se utiliza el puerto 587.
 
 uvicorn app.main:app --reload --port 8000   # levanta la API
 pytest -v                                   # corre todos los tests
@@ -59,10 +70,10 @@ pytest tests/integration -v                 # solo integración
 ```
 
 Tests:
+
 - `tests/unit/`: lógica de compra aislada (repositorio falso en memoria, fecha fija). Sin base, sin HTTP.
 - `tests/integration/`: API completa (TestClient de FastAPI) + base SQLite temporal.
 - `tests/conftest.py`: datos de prueba compartidos (fechas, `pedido_valido`).
-
 - Panel: http://localhost:8000 → botones **Comprar entradas (test)** (ejecuta pytest) y **Comprar entradas** (abre el front).
 - Documentación de la API: http://localhost:8000/docs
 - Base de datos: `Backend/ecoharmony.db` (SQLite, se crea sola). Se puede abrir con DBeaver o con una extensión de SQLite en VS Code.
@@ -85,8 +96,8 @@ npm test        # corre los tests de validación del cliente
 - Precios: Regular $10.000, VIP $20.000. Hasta 3 años inclusive: gratis; de 4 a 15 y desde 60: 50% de descuento. Edad válida: 0 a 120.
 - Anticipación máxima de un mes calendario, ajustando al último día del mes siguiente si corresponde. Compra para el día actual hasta las 17:30 inclusive (hora argentina).
 - Máximo de 10 entradas por usuario y fecha de visita, acumuladas entre transacciones, incluidas las gratuitas. SQLite verifica el límite dentro de una transacción de escritura. No hay cupo global diario.
-- El mail de confirmación es simulado: se guarda en la tabla `mails_enviados`.
 - Paleta del PO y fuente Lato; la fuente se carga desde Google Fonts y necesita conexión.
 - El servidor debe estar disponible para confirmar una compra. No se simula una compra exitosa ante errores de red.
+- La confirmación se registra en la tabla `mails_enviados` de SQLite. El envío SMTP es opcional y requiere `ECOHARMONY_EMAIL_FROM` y `ECOHARMONY_EMAIL_PASSWORD`. Si faltan las credenciales, no se intenta el envío SMTP. Si ocurre un error durante el intento, se registra el fallo y la compra ya persistida no se anula. El sistema no garantiza ni acredita la entrega del correo al destinatario.
 
 Las aclaraciones de `Consigna/requerimientos_PO.pdf` se aplican a compra de entradas. Cupos, turnos, vestimenta, DNI y QR de actividades corresponden a otra historia. Se mantiene pago exclusivamente en efectivo por el alcance acordado. El logo requiere diseño y validación del PO; no se considera aprobado.

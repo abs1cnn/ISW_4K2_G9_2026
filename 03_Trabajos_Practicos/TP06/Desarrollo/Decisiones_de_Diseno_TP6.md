@@ -1,8 +1,8 @@
 # Justificación de las decisiones de diseño
 
-**Trabajo práctico:** TP06 — EcoHarmony Park  
-**Historia de usuario:** Comprar entradas  
-**Equipo:** Grupo 9  
+**Trabajo práctico:** TP06 — EcoHarmony Park
+**Historia de usuario:** Comprar entradas
+**Equipo:** Grupo 9
 **Fecha:** 19/10/2026
 
 ## 1. Objetivo y alcance
@@ -31,13 +31,13 @@ dos procesos durante el desarrollo.
 
 ## 3. Tecnologías elegidas
 
-| Tecnología | Justificación en este proyecto | Consecuencia o límite |
-|---|---|---|
-| React y Vite | Permiten dividir el formulario, la confirmación y el resumen en componentes y actualizar la vista al cambiar edades o pase. | Requieren una aplicación frontend y su proceso de compilación. |
-| FastAPI | Permite exponer la compra mediante HTTP y sustituir dependencias en las pruebas de integración. | La API debe estar disponible para confirmar la compra. |
-| SQLite | Conserva los datos en un archivo y evita configurar un servidor de base de datos para el TP. | Las escrituras se serializan; la elección responde al alcance local del proyecto. |
-| SQL directo | Hace explícitas las consultas y transacciones de un modelo de tres tablas. | Los cambios de esquema deben gestionarse explícitamente; no hay un sistema de migraciones implementado. |
-| pytest y Vitest | Permiten verificar las reglas en backend y frontend con datos controlados. | Las pruebas de servicios no reemplazan pruebas visuales o de navegación completas. |
+| Tecnología     | Justificación en este proyecto                                                                                              | Consecuencia o límite                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| React y Vite    | Permiten dividir el formulario, la confirmación y el resumen en componentes y actualizar la vista al cambiar edades o pase. | Requieren una aplicación frontend y su proceso de compilación.                                         |
+| FastAPI         | Permite exponer la compra mediante HTTP y sustituir dependencias en las pruebas de integración.                             | La API debe estar disponible para confirmar la compra.                                                   |
+| SQLite          | Conserva los datos en un archivo y evita configurar un servidor de base de datos para el TP.                                 | Las escrituras se serializan; la elección responde al alcance local del proyecto.                       |
+| SQL directo     | Hace explícitas las consultas y transacciones de un modelo de tres tablas.                                                  | Los cambios de esquema deben gestionarse explícitamente; no hay un sistema de migraciones implementado. |
+| pytest y Vitest | Permiten verificar las reglas en backend y frontend con datos controlados.                                                   | Las pruebas de servicios no reemplazan pruebas visuales o de navegación completas.                      |
 
 ## 4. Validación en dos niveles
 
@@ -62,7 +62,7 @@ del resultado validado. La base contiene tres tablas:
 
 - `compras`: titular, fecha, cantidad, pase, forma de pago, total y estado.
 - `visitantes`: edades asociadas a cada compra.
-- `mails_enviados`: destinatario y texto de la confirmación simulada.
+- `mails_enviados`: destinatario y texto de la confirmación registrada localmente, independientemente del resultado del envío SMTP.
 
 Separar las edades en una tabla permite representar una cantidad variable de
 visitantes sin crear columnas como `edad1`, `edad2`, etc. Se guarda el total
@@ -94,12 +94,12 @@ Los precios base se definen en constantes: regular $10.000 y VIP $20.000.
 El tipo de pase se elige para toda la compra y la edad se informa por visitante.
 El total se obtiene sumando el precio correspondiente a cada edad:
 
-| Edad | Regla del PO | Regular | VIP |
-|---|---|---:|---:|
-| 0 a 3 inclusive | Gratuidad | $0 | $0 |
-| 4 a 15 inclusive | 50% de descuento | $5.000 | $10.000 |
-| 16 a 59 inclusive | Precio completo | $10.000 | $20.000 |
-| Desde 60 inclusive | 50% de descuento | $5.000 | $10.000 |
+| Edad               | Regla del PO     | Regular |     VIP |
+| ------------------ | ---------------- | ------: | ------: |
+| 0 a 3 inclusive    | Gratuidad        |      $0 |      $0 |
+| 4 a 15 inclusive   | 50% de descuento |  $5.000 | $10.000 |
+| 16 a 59 inclusive  | Precio completo  | $10.000 | $20.000 |
+| Desde 60 inclusive | 50% de descuento |  $5.000 | $10.000 |
 
 Se usan importes enteros en pesos porque los precios y descuentos actuales
 producen valores enteros. Esto evita cálculos monetarios con aproximaciones
@@ -146,9 +146,18 @@ mecanismo real de autenticación ni una solución multiusuario completa.
 
 ## 10. Confirmación y manejo de fallos
 
-El correo se simula guardando destinatario y mensaje en SQLite. Esto permite
-comprobar la confirmación sin credenciales ni acceso a un proveedor de correo.
-El texto informa cantidad, fecha, total pendiente y número de compra.
+La confirmación se registra en SQLite, conservando el destinatario y el mensaje
+para permitir su verificación sin depender de servicios externos. Adicionalmente,
+el backend intenta enviar el correo mediante SMTP cuando están configuradas las
+variables `ECOHARMONY_EMAIL_FROM` y `ECOHARMONY_EMAIL_PASSWORD`. Si faltan las credenciales, no se intenta el envío SMTP. Si ocurre un error durante el intento, se registra el fallo y la compra ya persistida no se anula. El sistema no garantiza ni acredita la entrega del correo al destinatario.
+
+La configuración `ECOHARMONY_SMTP_PORT` debe contener un número entero.
+Actualmente, su conversión se realiza antes del manejo de excepciones del
+servicio SMTP. Si contiene un valor no numérico, la API puede responder con
+un error HTTP 500 aunque la compra y su confirmación ya estén guardadas.
+Además, el sistema no registra un estado de entrega del correo: el registro
+local y la aceptación del mensaje por un servidor SMTP no garantizan su
+recepción en el buzón del destinatario.
 
 Las operaciones de guardar y enviar confirmación se pasan al servicio como
 funciones. En los tests unitarios se reemplazan por un repositorio en memoria,
@@ -210,9 +219,7 @@ pruebas y los endpoints de listado de compras y mails no tienen control de acces
 Antes de un despliegue público se necesitarían autenticación, autorización y
 una definición del acceso a esos datos y herramientas.
 
-No forman parte de esta entrega la pasarela de pago, el envío real de correo,
-la gestión completa de usuarios ni la inscripción a actividades. El diseño del
-logo requiere validación del PO y no se considera aprobado por este documento.
+No forman parte de esta entrega la pasarela de pago, una infraestructura de correo con entrega garantizada, la gestión completa de usuarios ni la inscripción a actividades.
 
 ## 14. Referencias del proyecto
 
