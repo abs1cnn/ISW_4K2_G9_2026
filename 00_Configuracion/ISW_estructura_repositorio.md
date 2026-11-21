@@ -1,4 +1,5 @@
-Estructura del repositorio
+
+## Estructura del repositorio
 
 ```text
 ISW/
@@ -15,12 +16,16 @@ ISW/
 │       ├── Notas/
 │       ├── Practica/
 │       └── Resumenes/
+│   
 │
 ├── 03_Trabajos_Practicos/
 │   └── TP<<Nro>>/
 │       ├── Consigna/
 │       ├── Desarrollo/
-│       └── Entrega/
+│       ├── Frontend/
+│       ├── Backend/
+│       ├── UserStories/
+│       └── Entrega/ 
 │
 ├── 04_Parciales/
 │   ├── Primer_Parcial/
@@ -39,10 +44,10 @@ ISW/
 │   └── Ejercicios/
 │
 ├── 06_Clases/
-│   ├── Presentaciones/
 │   ├── Apuntes/
-│   └── Grabaciones/
-│
+│   ├── Grabaciones/
+│   └── Presentaciones/
+│  
 ├── 07_Trabajos_Investigacion/
 │   ├── Lineamientos/
 │   └── TI<<Nro>>/
