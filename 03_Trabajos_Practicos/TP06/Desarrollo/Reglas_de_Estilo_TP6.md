@@ -9,16 +9,16 @@ Complementa [Decisiones de diseno](Decisiones_de_Diseno_TP6.md).
 
 ## 1. Nombres
 
-| Elemento | Regla | Ejemplos del código |
-|---|---|---|
-| Idioma | Dominio en español; términos técnicos del framework en inglés | `comprar_entradas`, `parque_abierto`, `Repositorio` |
-| Funciones y variables Python | `snake_case`, verbo + objeto | `validar_pedido`, `calcular_total`, `parsear_fecha` |
-| Funciones y variables JS | `camelCase` | `comprarEntradas`, `formatearFecha`, `totalConfirmado` |
-| Clases y componentes | `PascalCase` | `CompraInvalidaError`, `Pedido`, `CompraEntradas` |
-| Constantes | `MAYUSCULAS_CON_GUION_BAJO`, definidas arriba del módulo | `MAX_ENTRADAS`, `DIAS_ABIERTO`, `FORMAS_PAGO` |
-| Funciones privadas Python | Prefijo `_` | `_conectar` |
-| Booleanos | Nombre en forma de pregunta o estado | `parque_abierto`, `es_entero` |
-| Errores | Sufijo `Error` | `CompraInvalidaError` |
+| Elemento                     | Regla                                                             | Ejemplos del código                                         |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| Idioma                       | Dominio en español; términos técnicos del framework en inglés | `comprar_entradas`, `parque_abierto`, `Repositorio`    |
+| Funciones y variables Python | `snake_case`, verbo + objeto                                    | `validar_pedido`, `calcular_total`, `parsear_fecha`    |
+| Funciones y variables JS     | `camelCase`                                                     | `comprarEntradas`, `formatearFecha`, `totalConfirmado` |
+| Clases y componentes         | `PascalCase`                                                    | `CompraInvalidaError`, `Pedido`, `CompraEntradas`      |
+| Constantes                   | `MAYUSCULAS_CON_GUION_BAJO`, definidas arriba del módulo       | `MAX_ENTRADAS`, `DIAS_ABIERTO`, `FORMAS_PAGO`          |
+| Funciones privadas Python    | Prefijo `_`                                                     | `_conectar`                                                |
+| Booleanos                    | Nombre en forma de pregunta o estado                              | `parque_abierto`, `es_entero`                            |
+| Errores                      | Sufijo `Error`                                                  | `CompraInvalidaError`                                      |
 
 ## 2. Formato
 
@@ -48,9 +48,13 @@ Complementa [Decisiones de diseno](Decisiones_de_Diseno_TP6.md).
 - Nombre: `test_<acción>_<resultado esperado>`, por ejemplo `test_comprar_entradas_parque_cerrado_falla`.
 - Estructura **Arrange / Act / Assert**; un concepto por test.
 - Los casos con varios valores usan parametrización (`pytest.mark.parametrize`, `it.each`) en lugar de duplicar tests.
-- Los servicios externos se reemplazan por dobles de prueba; los tests no dependen de la hora real, de la red ni de `ecoharmony.db`.
 - Los tests de fallo verifican además que **no** hubo efectos secundarios (sin compra guardada, sin mail enviado).
 - Datos de prueba compartidos en `conftest.py`; cada test modifica solo lo que quiere probar (`pedido_valido(**cambios)`).
+- En los tests unitarios se sustituyen las dependencias externas por dobles
+  de prueba. Los tests de integración utilizan una base SQLite temporal y
+  un reloj controlado, pero todavía no sustituyen explícitamente el servicio
+  SMTP. Si hay credenciales reales configuradas, podrían intentar establecer
+  una conexión de red.
 
 ## 6. Estructura del proyecto
 
@@ -70,7 +74,7 @@ Frontend/src/    components/ (interfaz) y services/ (reglas de negocio y sus tes
 - No hay configuracion de Black, Ruff, ESLint o Prettier en los archivos revisados.
 - La unica forma de pago implementada es efectivo. No existe un modulo de
   Mercado Pago ni un servicio real de registro de usuarios en esta version.
-- La sesion es simulada y el correo se registra en SQLite sin envio real.
+- La sesion es simulada. La confirmación se registra en SQLite y el envío real mediante SMTP es opcional, condicionado a la configuración de las credenciales correspondientes.
 - La interfaz utiliza un resumen general con total original, cada descuento
   aplicado y total final; no separa el resumen por visitante.
 - El ciclo TDD verificable corresponde al formato estricto AAAA-MM-DD.
